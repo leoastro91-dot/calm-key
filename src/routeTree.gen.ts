@@ -9,38 +9,169 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ActualizarPasswordRouteImport } from './routes/actualizar-password'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistroRoute = RegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActualizarPasswordRoute = ActualizarPasswordRouteImport.update({
+  id: '/actualizar-password',
+  path: '/actualizar-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBienvenidaRoute = AuthenticatedBienvenidaRouteImport.update({
+  id: '/bienvenida',
+  path: '/bienvenida',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/actualizar-password': typeof ActualizarPasswordRoute
+  '/login': typeof LoginRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/registro': typeof RegistroRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/bienvenida': typeof AuthenticatedBienvenidaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/actualizar-password': typeof ActualizarPasswordRoute
+  '/login': typeof LoginRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/registro': typeof RegistroRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/bienvenida': typeof AuthenticatedBienvenidaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/actualizar-password': typeof ActualizarPasswordRoute
+  '/login': typeof LoginRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/registro': typeof RegistroRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/actualizar-password'
+    | '/login'
+    | '/recuperar-password'
+    | '/registro'
+    | '/sitemap.xml'
+    | '/bienvenida'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/actualizar-password'
+    | '/login'
+    | '/recuperar-password'
+    | '/registro'
+    | '/sitemap.xml'
+    | '/bienvenida'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/actualizar-password'
+    | '/login'
+    | '/recuperar-password'
+    | '/registro'
+    | '/sitemap.xml'
+    | '/_authenticated/bienvenida'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ActualizarPasswordRoute: typeof ActualizarPasswordRoute
+  LoginRoute: typeof LoginRoute
+  RecuperarPasswordRoute: typeof RecuperarPasswordRoute
+  RegistroRoute: typeof RegistroRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registro': {
+      id: '/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof RegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-password': {
+      id: '/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof RecuperarPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/actualizar-password': {
+      id: '/actualizar-password'
+      path: '/actualizar-password'
+      fullPath: '/actualizar-password'
+      preLoaderRoute: typeof ActualizarPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +179,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/bienvenida': {
+      id: '/_authenticated/bienvenida'
+      path: '/bienvenida'
+      fullPath: '/bienvenida'
+      preLoaderRoute: typeof AuthenticatedBienvenidaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ActualizarPasswordRoute: ActualizarPasswordRoute,
+  LoginRoute: LoginRoute,
+  RecuperarPasswordRoute: RecuperarPasswordRoute,
+  RegistroRoute: RegistroRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

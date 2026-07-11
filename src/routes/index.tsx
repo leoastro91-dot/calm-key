@@ -1,24 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useAuth } from "@/features/identity/hooks/useAuth";
+import { FullScreenLoader } from "@/features/identity/components/AuthLayout";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Finance OS — Planeación financiera personal" },
+      { name: "description", content: "Plataforma de planeación financiera personal y colaborativa. Privada, segura y bajo tu control." },
+      { property: "og:title", content: "Finance OS — Planeación financiera personal" },
+      { property: "og:description", content: "Plataforma de planeación financiera personal y colaborativa." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+// La raíz solo decide destino según la sesión (Sección 6 del flujo).
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+  const { session, isLoading } = useAuth();
+  if (isLoading) return <FullScreenLoader />;
+  return session ? <Navigate to="/bienvenida" /> : <Navigate to="/login" />;
 }
