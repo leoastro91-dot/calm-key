@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       { title: "Finance OS — Planeación financiera personal" },
       { name: "description", content: "Plataforma de planeación financiera personal y colaborativa. Privada, segura y bajo tu control." },
       { property: "og:title", content: "Finance OS — Planeación financiera personal" },
-      { property: "og:description", content: "Plataforma de planeación financiera personal y colaborativa." },
+      { property: "og:description", content: "Plataforma de planeación financiera personal y colaborativa. Privada, segura y bajo tu control." },
     ],
   }),
   component: Index,

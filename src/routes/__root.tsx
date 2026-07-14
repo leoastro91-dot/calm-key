@@ -89,10 +89,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Finance OS — Planeación financiera personal" },
       {
         property: "og:description",
-        content: "Plataforma de planeación financiera personal y colaborativa.",
+        content: "Plataforma de planeación financiera personal y colaborativa. Privada, segura y bajo tu control.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Finance OS — Planeación financiera personal" },
+      { name: "twitter:description", content: "Plataforma de planeación financiera personal y colaborativa. Privada, segura y bajo tu control." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/39d985e4-a33d-4052-b7fd-58e3ea0d4675/id-preview-03115d69--040ac97c-2190-4287-aacb-50247c571f20.lovable.app-1784070670930.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/39d985e4-a33d-4052-b7fd-58e3ea0d4675/id-preview-03115d69--040ac97c-2190-4287-aacb-50247c571f20.lovable.app-1784070670930.png" },
     ],
     links: [
       {
