@@ -16,8 +16,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ActualizarPasswordRouteImport } from './routes/actualizar-password'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
+import { Route as AuthenticatedOnboardingIndexRouteImport } from './routes/_authenticated/onboarding.index'
 import { Route as AuthenticatedOnboardingCompletadoRouteImport } from './routes/_authenticated/onboarding.completado'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -54,21 +54,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedBienvenidaRoute = AuthenticatedBienvenidaRouteImport.update({
   id: '/bienvenida',
   path: '/bienvenida',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOnboardingIndexRoute =
+  AuthenticatedOnboardingIndexRouteImport.update({
+    id: '/onboarding/',
+    path: '/onboarding/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingCompletadoRoute =
   AuthenticatedOnboardingCompletadoRouteImport.update({
-    id: '/completado',
-    path: '/completado',
-    getParentRoute: () => AuthenticatedOnboardingRoute,
+    id: '/onboarding/completado',
+    path: '/onboarding/completado',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -79,8 +80,8 @@ export interface FileRoutesByFullPath {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
-  '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
+  '/onboarding/': typeof AuthenticatedOnboardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,8 +91,8 @@ export interface FileRoutesByTo {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
-  '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
+  '/onboarding': typeof AuthenticatedOnboardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,8 +104,8 @@ export interface FileRoutesById {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
-  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/_authenticated/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
+  '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -116,8 +117,8 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
-    | '/onboarding'
     | '/onboarding/completado'
+    | '/onboarding/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -127,8 +128,8 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
-    | '/onboarding'
     | '/onboarding/completado'
+    | '/onboarding'
   id:
     | '__root__'
     | '/'
@@ -139,8 +140,8 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/_authenticated/bienvenida'
-    | '/_authenticated/onboarding'
     | '/_authenticated/onboarding/completado'
+    | '/_authenticated/onboarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,13 +205,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/bienvenida': {
       id: '/_authenticated/bienvenida'
       path: '/bienvenida'
@@ -218,39 +212,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBienvenidaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/onboarding/': {
+      id: '/_authenticated/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof AuthenticatedOnboardingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding/completado': {
       id: '/_authenticated/onboarding/completado'
-      path: '/completado'
+      path: '/onboarding/completado'
       fullPath: '/onboarding/completado'
       preLoaderRoute: typeof AuthenticatedOnboardingCompletadoRouteImport
-      parentRoute: typeof AuthenticatedOnboardingRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedOnboardingRouteChildren {
-  AuthenticatedOnboardingCompletadoRoute: typeof AuthenticatedOnboardingCompletadoRoute
-}
-
-const AuthenticatedOnboardingRouteChildren: AuthenticatedOnboardingRouteChildren =
-  {
-    AuthenticatedOnboardingCompletadoRoute:
-      AuthenticatedOnboardingCompletadoRoute,
-  }
-
-const AuthenticatedOnboardingRouteWithChildren =
-  AuthenticatedOnboardingRoute._addFileChildren(
-    AuthenticatedOnboardingRouteChildren,
-  )
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
-  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRouteWithChildren
+  AuthenticatedOnboardingCompletadoRoute: typeof AuthenticatedOnboardingCompletadoRoute
+  AuthenticatedOnboardingIndexRoute: typeof AuthenticatedOnboardingIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
-  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRouteWithChildren,
+  AuthenticatedOnboardingCompletadoRoute:
+    AuthenticatedOnboardingCompletadoRoute,
+  AuthenticatedOnboardingIndexRoute: AuthenticatedOnboardingIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

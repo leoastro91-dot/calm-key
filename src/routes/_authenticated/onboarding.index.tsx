@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { OnboardingWizard } from "@/features/onboarding/components/OnboardingWizard";
 
-export const Route = createFileRoute("/_authenticated/onboarding")({
+export const Route = createFileRoute("/_authenticated/onboarding/")({
   head: () => ({
     meta: [
       { title: "Configura tu perfil financiero — Finance OS" },
