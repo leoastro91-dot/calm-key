@@ -81,14 +81,15 @@ export function WelcomeCard() {
       </dl>
 
       <div className="flex flex-col gap-3">
-        <div className="relative">
-          <Button disabled fullWidth>
-            Configurar mi perfil financiero
-          </Button>
-          <span className="absolute -top-2 right-3 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
-            Próximamente
-          </span>
-        </div>
+        {profile.account_status === "onboarding" ? (
+          <Link to="/onboarding" className="w-full">
+            <Button fullWidth>Configurar mi perfil financiero</Button>
+          </Link>
+        ) : (
+          <Alert variant="success">
+            Tu perfil financiero ya está configurado.
+          </Alert>
+        )}
         <div className="flex justify-center">
           <LogoutButton />
         </div>
