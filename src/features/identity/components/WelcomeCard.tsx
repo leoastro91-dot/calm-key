@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Card } from "@/features/shared/components/Card";
 import { Alert } from "@/features/shared/components/Alert";
 import { Badge } from "@/features/shared/components/Badge";
