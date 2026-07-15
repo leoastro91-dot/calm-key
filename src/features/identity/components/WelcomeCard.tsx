@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Card } from "@/features/shared/components/Card";
 import { Alert } from "@/features/shared/components/Alert";
 import { Badge } from "@/features/shared/components/Badge";
@@ -80,14 +81,15 @@ export function WelcomeCard() {
       </dl>
 
       <div className="flex flex-col gap-3">
-        <div className="relative">
-          <Button disabled fullWidth>
-            Configurar mi perfil financiero
-          </Button>
-          <span className="absolute -top-2 right-3 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
-            Próximamente
-          </span>
-        </div>
+        {profile.account_status === "onboarding" ? (
+          <Link to="/onboarding" className="w-full">
+            <Button fullWidth>Configurar mi perfil financiero</Button>
+          </Link>
+        ) : (
+          <Alert variant="success">
+            Tu perfil financiero ya está configurado.
+          </Alert>
+        )}
         <div className="flex justify-center">
           <LogoutButton />
         </div>
