@@ -86,9 +86,16 @@ export function WelcomeCard() {
             <Button fullWidth>Configurar mi perfil financiero</Button>
           </Link>
         ) : (
-          <Link to="/cuentas" className="w-full">
-            <Button fullWidth>Ir a mis cuentas y bolsillos</Button>
-          </Link>
+          <>
+            <Link to="/ingresos" className="w-full">
+              <Button fullWidth>Registrar mis ingresos</Button>
+            </Link>
+            <Link to="/cuentas" className="w-full">
+              <Button variant="secondary" fullWidth>
+                Ir a mis cuentas y bolsillos
+              </Button>
+            </Link>
+          </>
         )}
         <div className="flex justify-center">
           <LogoutButton />
