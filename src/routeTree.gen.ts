@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ActualizarPasswordRouteImport } from './routes/actualizar-password'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedCuentasRouteImport } from './routes/_authenticated/cuentas'
 import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
 import { Route as AuthenticatedOnboardingIndexRouteImport } from './routes/_authenticated/onboarding.index'
 import { Route as AuthenticatedOnboardingCompletadoRouteImport } from './routes/_authenticated/onboarding.completado'
@@ -54,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCuentasRoute = AuthenticatedCuentasRouteImport.update({
+  id: '/cuentas',
+  path: '/cuentas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBienvenidaRoute = AuthenticatedBienvenidaRouteImport.update({
   id: '/bienvenida',
   path: '/bienvenida',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/cuentas': typeof AuthenticatedCuentasRoute
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/onboarding/': typeof AuthenticatedOnboardingIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/cuentas': typeof AuthenticatedCuentasRoute
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/onboarding': typeof AuthenticatedOnboardingIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/_authenticated/cuentas': typeof AuthenticatedCuentasRoute
   '/_authenticated/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexRoute
 }
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
+    | '/cuentas'
     | '/onboarding/completado'
     | '/onboarding/'
   fileRoutesByTo: FileRoutesByTo
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
+    | '/cuentas'
     | '/onboarding/completado'
     | '/onboarding'
   id:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/_authenticated/bienvenida'
+    | '/_authenticated/cuentas'
     | '/_authenticated/onboarding/completado'
     | '/_authenticated/onboarding/'
   fileRoutesById: FileRoutesById
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/cuentas': {
+      id: '/_authenticated/cuentas'
+      path: '/cuentas'
+      fullPath: '/cuentas'
+      preLoaderRoute: typeof AuthenticatedCuentasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/bienvenida': {
       id: '/_authenticated/bienvenida'
       path: '/bienvenida'
@@ -231,12 +250,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
+  AuthenticatedCuentasRoute: typeof AuthenticatedCuentasRoute
   AuthenticatedOnboardingCompletadoRoute: typeof AuthenticatedOnboardingCompletadoRoute
   AuthenticatedOnboardingIndexRoute: typeof AuthenticatedOnboardingIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
+  AuthenticatedCuentasRoute: AuthenticatedCuentasRoute,
   AuthenticatedOnboardingCompletadoRoute:
     AuthenticatedOnboardingCompletadoRoute,
   AuthenticatedOnboardingIndexRoute: AuthenticatedOnboardingIndexRoute,
