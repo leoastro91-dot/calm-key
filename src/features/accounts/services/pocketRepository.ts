@@ -73,6 +73,17 @@ export const pocketRepository = {
     if (error) throw error;
   },
 
+  async updateTarget(id: string, target_amount: number | null): Promise<Pocket> {
+    const { data, error } = await getSupabase()
+      .from("pockets")
+      .update({ target_amount })
+      .eq("id", id)
+      .select(COLS)
+      .single();
+    if (error) throw error;
+    return data as Pocket;
+  },
+
   async deactivate(id: string): Promise<void> {
     const { error } = await getSupabase()
       .from("pockets")
