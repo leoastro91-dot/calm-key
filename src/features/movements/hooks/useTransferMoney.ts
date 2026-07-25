@@ -10,7 +10,7 @@
  *   4. INSERT transactions con to_account_id/to_pocket_id (+ category_id/affects_budget/budget_item_id).
  *   5. UPDATE pockets: origen -= X, destino += X.
  *   6. SI cambia de cuenta: UPDATE accounts.current_balance en ambos.
- *   7. SI hay budget_item: recalcular actual_amount/current_execution_pct/overspend.
+ *   7. SI hay budget_item: reconciliar actual_amount/current_execution_pct/overspend desde transactions.
  *
  * Invariante: accounts.current_balance = Σ pockets.balance en origen y destino.
  * Patrimonio total nunca cambia (RInt-03).
@@ -150,17 +150,14 @@ export function useTransferMoney() {
       }
 
       // 7. Ejecución del presupuesto si aplica.
-      //    - transfer (aporte a ahorro/construcción) suma ejecución.
-      //    - emergency_use (retiro de bolsillo protegido) revierte la
-      //      ejecución previa: el dinero deja de estar destinado a esa meta,
-      //      por eso el delta es negativo (nunca por debajo de 0).
+      //    La ejecución se deriva de transactions categorizadas con
+      //    affects_budget=true, sin distinguir type.
       if (budgetItem) {
-        const rawDelta = type === "emergency_use" ? -input.amount : input.amount;
-        const current = Number(budgetItem.actual_amount) || 0;
-        const delta = Math.max(rawDelta, -current);
-        if (delta !== 0) {
-          await budgetItemRepository.applyExpense(budgetItem, delta);
-        }
+        await budgetItemRepository.refreshExecutionForTransaction({
+          budget_item_id: budgetItem.id,
+          category_id: input.category_id,
+          affects_budget: true,
+        });
       }
 
       // Silenciar warning de linter (accountRepository importado como fuente

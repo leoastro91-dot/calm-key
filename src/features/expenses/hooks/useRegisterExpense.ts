@@ -6,10 +6,10 @@
  *   2. Buscar budget_item de la categoría en el presupuesto activo (puede no existir).
  *   3. INSERT transactions (type='expense', affects_budget=true, budget_item_id).
  *   4. UPDATE pockets.balance -= X y accounts.current_balance -= X.
- *   5. SI existe budget_item: recalcular actual_amount, current_execution_pct, overspend.
+ *   5. SI existe budget_item: reconciliar ejecución desde transactions.
  *
  * Invariante: accounts.current_balance = Σ pockets.balance en la cuenta afectada.
- * RN-05: budget_items.actual_amount solo se mueve con gastos affects_budget=true.
+ * RN-05: budget_items.actual_amount se deriva de transactions affects_budget=true.
  * RP-06: nunca se bloquea un gasto por superar el presupuesto.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -119,9 +119,13 @@ export function useRegisterExpense() {
         .eq("id", input.account_id);
       if (acctErr) throw acctErr;
 
-      // 5. Recalcular ejecución si hay línea de presupuesto.
+      // 5. Reconciliar ejecución si hay línea de presupuesto.
       if (budgetItem) {
-        await budgetItemRepository.applyExpense(budgetItem, input.amount);
+        await budgetItemRepository.refreshExecutionForTransaction({
+          budget_item_id: budgetItem.id,
+          category_id: input.category_id,
+          affects_budget: true,
+        });
       }
 
       return { linkedToBudget: Boolean(budgetItem) };

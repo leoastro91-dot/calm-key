@@ -11,7 +11,7 @@
  *   4. UPDATE pockets.balance -= monto_total y accounts.current_balance -= monto_total.
  *   5. UPDATE debts.current_balance -= abono_capital;
  *      status='paid' si el nuevo saldo llega a 0.
- *   6. Si hay budget_item: aplicar monto_total como ejecución del presupuesto.
+ *   6. Si hay budget_item: reconciliar ejecución desde transactions.
  *
  * Invariante: accounts.current_balance = SUM(pockets.balance) tras el abono.
  * debts.current_balance nunca queda negativo (validado en el paso 1).
@@ -144,7 +144,11 @@ export function useRegisterDebtPayment() {
 
       // 6. Ejecución de presupuesto si aplica (monto total pagado).
       if (budgetItem) {
-        await budgetItemRepository.applyExpense(budgetItem, input.amount_total);
+        await budgetItemRepository.refreshExecutionForTransaction({
+          budget_item_id: budgetItem.id,
+          category_id: input.category_id,
+          affects_budget: true,
+        });
       }
 
       return {
