@@ -9,8 +9,16 @@ import { CreateDebtForm } from "./CreateDebtForm";
 import { DebtList } from "./DebtList";
 
 export function DebtsScreen() {
-  const { activeDebts, paidDebts, accounts, pockets, isLoading, isError, refetch } =
-    useDebts();
+  const {
+    activeDebts,
+    paidDebts,
+    accounts,
+    pockets,
+    categories,
+    isLoading,
+    isError,
+    refetch,
+  } = useDebts();
   const [showForm, setShowForm] = useState(false);
 
   if (isLoading) {
@@ -57,6 +65,7 @@ export function DebtsScreen() {
         debts={activeDebts}
         accounts={accounts}
         pockets={pockets}
+        categories={categories}
         emptyText="Aún no has registrado deudas activas. Cuando agregues una, aparecerá aquí con su saldo pendiente."
       />
 
@@ -66,6 +75,7 @@ export function DebtsScreen() {
           debts={paidDebts}
           accounts={accounts}
           pockets={pockets}
+          categories={categories}
         />
       )}
     </div>

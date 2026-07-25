@@ -4,6 +4,10 @@
  * transactions.amount = monto total pagado (el movimiento real de dinero).
  * El desglose capital/interés no se persiste aquí: se usa sólo para restar
  * al saldo de la deuda (ver useRegisterDebtPayment).
+ *
+ * v1.1: acepta category_id/budget_item_id/affects_budget opcionales para
+ * vincular el abono a una línea del presupuesto activo — mismo patrón que
+ * los traslados categorizados de LOVABLE-005 v1.1.
  */
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { DebtPaymentRow } from "../domain/types";
@@ -22,6 +26,9 @@ export const debtTransactionRepository = {
     pocket_id: string;
     debt_id: string;
     financial_period_id: string | null;
+    category_id?: string | null;
+    budget_item_id?: string | null;
+    affects_budget?: boolean;
   }): Promise<{ id: string }> {
     if (input.amount <= 0) throw new Error("DEBT_PAYMENT_MUST_BE_POSITIVE");
     const { data, error } = await getSupabase()
@@ -38,12 +45,12 @@ export const debtTransactionRepository = {
         to_account_id: null,
         to_pocket_id: null,
         debt_id: input.debt_id,
-        category_id: null,
+        category_id: input.category_id ?? null,
         subcategory_id: null,
-        budget_item_id: null,
+        budget_item_id: input.budget_item_id ?? null,
         financial_period_id: input.financial_period_id,
         spending_nature: "normal",
-        affects_budget: false,
+        affects_budget: input.affects_budget ?? false,
         is_onboarding_entry: false,
       })
       .select("id")
