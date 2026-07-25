@@ -3,6 +3,7 @@ import { Alert } from "@/features/shared/components/Alert";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
 import { useDashboardData } from "../hooks/useDashboardData";
+import { useGoalPockets } from "@/features/goals/hooks/useGoalPockets";
 import { PatrimonySummary } from "./PatrimonySummary";
 import { MoneyStateGrid } from "./MoneyStateGrid";
 import { ActivePeriodProgress } from "./ActivePeriodProgress";
@@ -10,6 +11,7 @@ import { BudgetBlocksSummary } from "./BudgetBlocksSummary";
 import { RealDistributionComparison } from "./RealDistributionComparison";
 import { RecentExpensesList } from "./RecentExpensesList";
 import { DebtsSummaryCard } from "./DebtsSummaryCard";
+import { GoalsSummarySection } from "./GoalsSummarySection";
 
 function SectionEmpty({ children }: { children: React.ReactNode }) {
   return (
