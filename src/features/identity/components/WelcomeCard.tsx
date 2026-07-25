@@ -110,6 +110,11 @@ export function WelcomeCard() {
                 Ir a mis cuentas y bolsillos
               </Button>
             </Link>
+            <Link to="/configuracion" className="w-full">
+              <Button variant="ghost" fullWidth>
+                Ajustar mi distribución 50/30/20
+              </Button>
+            </Link>
           </>
         )}
         <div className="flex justify-center">
