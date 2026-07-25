@@ -72,6 +72,7 @@ export interface Pocket {
   money_state: MoneyState;
   balance: number;
   is_active: boolean;
+  target_amount: number | null;
 }
 
 /** ADR-013 — Cálculo puro de end_date según period_type. */
