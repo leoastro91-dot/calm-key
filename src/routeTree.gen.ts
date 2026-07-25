@@ -21,6 +21,7 @@ import { Route as AuthenticatedMovimientosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedIngresosRouteImport } from './routes/_authenticated/ingresos'
 import { Route as AuthenticatedGastosRouteImport } from './routes/_authenticated/gastos'
 import { Route as AuthenticatedCuentasRouteImport } from './routes/_authenticated/cuentas'
+import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated/configuracion'
 import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
 import { Route as AuthenticatedOnboardingIndexRouteImport } from './routes/_authenticated/onboarding.index'
 import { Route as AuthenticatedOnboardingCompletadoRouteImport } from './routes/_authenticated/onboarding.completado'
@@ -86,6 +87,12 @@ const AuthenticatedCuentasRoute = AuthenticatedCuentasRouteImport.update({
   path: '/cuentas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConfiguracionRoute =
+  AuthenticatedConfiguracionRouteImport.update({
+    id: '/configuracion',
+    path: '/configuracion',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBienvenidaRoute = AuthenticatedBienvenidaRouteImport.update({
   id: '/bienvenida',
   path: '/bienvenida',
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
@@ -128,6 +136,7 @@ export interface FileRoutesByTo {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
@@ -146,6 +155,7 @@ export interface FileRoutesById {
   '/registro': typeof RegistroRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
+  '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
   '/_authenticated/cuentas': typeof AuthenticatedCuentasRoute
   '/_authenticated/gastos': typeof AuthenticatedGastosRoute
   '/_authenticated/ingresos': typeof AuthenticatedIngresosRoute
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
+    | '/configuracion'
     | '/cuentas'
     | '/gastos'
     | '/ingresos'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/bienvenida'
+    | '/configuracion'
     | '/cuentas'
     | '/gastos'
     | '/ingresos'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sitemap.xml'
     | '/_authenticated/bienvenida'
+    | '/_authenticated/configuracion'
     | '/_authenticated/cuentas'
     | '/_authenticated/gastos'
     | '/_authenticated/ingresos'
@@ -302,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/configuracion': {
+      id: '/_authenticated/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof AuthenticatedConfiguracionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/bienvenida': {
       id: '/_authenticated/bienvenida'
       path: '/bienvenida'
@@ -328,6 +348,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
+  AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
   AuthenticatedCuentasRoute: typeof AuthenticatedCuentasRoute
   AuthenticatedGastosRoute: typeof AuthenticatedGastosRoute
   AuthenticatedIngresosRoute: typeof AuthenticatedIngresosRoute
@@ -339,6 +360,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
+  AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
   AuthenticatedCuentasRoute: AuthenticatedCuentasRoute,
   AuthenticatedGastosRoute: AuthenticatedGastosRoute,
   AuthenticatedIngresosRoute: AuthenticatedIngresosRoute,
