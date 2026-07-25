@@ -87,8 +87,11 @@ export function WelcomeCard() {
           </Link>
         ) : (
           <>
+            <Link to="/dashboard" className="w-full">
+              <Button fullWidth>Ir a mi dashboard</Button>
+            </Link>
             <Link to="/ingresos" className="w-full">
-              <Button fullWidth>Registrar mis ingresos</Button>
+              <Button variant="secondary" fullWidth>Registrar mis ingresos</Button>
             </Link>
             <Link to="/presupuesto" className="w-full">
               <Button variant="secondary" fullWidth>
