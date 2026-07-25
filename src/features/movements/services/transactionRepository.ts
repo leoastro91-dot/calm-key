@@ -1,12 +1,15 @@
 /**
  * Repository (ADR-001): transactions — extendido para traslados internos.
- * Solo tipos 'transfer' y 'emergency_use'. CHECK (amount > 0) en la DB.
+ * LOVABLE-005 v1.1: acepta category_id/budget_item_id/affects_budget opcionales
+ * para que un traslado hacia ahorro/protección pueda contar como ejecución
+ * de una línea del presupuesto de Construcción.
+ * CHECK (amount > 0) en la DB.
  */
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { TransferRow, TransferType } from "../domain/types";
 
 const COLS =
-  "id, type, amount, date, description, account_id, pocket_id, to_account_id, to_pocket_id";
+  "id, type, amount, date, description, account_id, pocket_id, to_account_id, to_pocket_id, category_id";
 
 export const transferTransactionRepository = {
   async create(input: {
@@ -21,6 +24,9 @@ export const transferTransactionRepository = {
     to_account_id: string;
     to_pocket_id: string;
     financial_period_id: string | null;
+    category_id: string | null;
+    budget_item_id: string | null;
+    affects_budget: boolean;
   }): Promise<{ id: string }> {
     if (input.amount <= 0) throw new Error("TRANSFER_MUST_BE_POSITIVE");
     const { data, error } = await getSupabase()
@@ -37,9 +43,11 @@ export const transferTransactionRepository = {
         to_account_id: input.to_account_id,
         to_pocket_id: input.to_pocket_id,
         financial_period_id: input.financial_period_id,
-        category_id: null,
+        category_id: input.category_id,
+        subcategory_id: null,
+        budget_item_id: input.budget_item_id,
         spending_nature: "normal",
-        affects_budget: false,
+        affects_budget: input.affects_budget,
         is_onboarding_entry: false,
       })
       .select("id")

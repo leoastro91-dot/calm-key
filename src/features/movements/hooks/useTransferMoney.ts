@@ -1,12 +1,16 @@
 /**
- * Traslado interno entre dos bolsillos del mismo usuario (LOVABLE-005 §12.1).
+ * Traslado interno entre dos bolsillos del mismo usuario (LOVABLE-005 §12.1,
+ * v1.1). Ahora acepta category_id opcional — si se elige, el traslado
+ * cuenta como ejecución de esa línea del presupuesto activo (§12 v1.1).
  *
  * Secuencia:
  *   1. Validar monto > 0 y monto <= balance actual del bolsillo origen.
  *   2. type = 'emergency_use' si el bolsillo origen es 'protected', si no 'transfer'.
- *   3. INSERT transactions con to_account_id/to_pocket_id.
- *   4. UPDATE pockets: origen -= X, destino += X.
- *   5. SI cambia de cuenta: UPDATE accounts.current_balance en ambos.
+ *   3. Si hay categoría: buscar budget_item en el presupuesto activo (puede no existir).
+ *   4. INSERT transactions con to_account_id/to_pocket_id (+ category_id/affects_budget/budget_item_id).
+ *   5. UPDATE pockets: origen -= X, destino += X.
+ *   6. SI cambia de cuenta: UPDATE accounts.current_balance en ambos.
+ *   7. SI hay budget_item: recalcular actual_amount/current_execution_pct/overspend.
  *
  * Invariante: accounts.current_balance = Σ pockets.balance en origen y destino.
  * Patrimonio total nunca cambia (RInt-03).
@@ -17,6 +21,8 @@ import { useWorkspace } from "@/features/identity/hooks/useWorkspace";
 import { pocketRepository } from "@/features/accounts/services/pocketRepository";
 import { accountRepository } from "@/features/accounts/services/accountRepository";
 import { financialPeriodRepository } from "@/features/onboarding/services/financialPeriodRepository";
+import { budgetRepository } from "@/features/budget/services/budgetRepository";
+import { budgetItemRepository } from "@/features/budget/services/budgetItemRepository";
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 import { transferTransactionRepository } from "../services/transactionRepository";
 
@@ -28,6 +34,7 @@ export interface TransferInput {
   from_pocket_id: string;
   to_account_id: string;
   to_pocket_id: string;
+  category_id: string | null;
 }
 
 async function fetchPocket(id: string) {
@@ -77,11 +84,25 @@ export function useTransferMoney() {
       const type: "transfer" | "emergency_use" =
         source.money_state === "protected" ? "emergency_use" : "transfer";
 
-      // 3. Período activo (si existe).
+      // 3. Período activo (si existe) + budget_item si hay categoría.
       const period = await financialPeriodRepository.getActive(
         user.id,
         workspace.id,
       );
+      let budgetItem = null as Awaited<
+        ReturnType<typeof budgetItemRepository.findByCategory>
+      >;
+      if (input.category_id && period) {
+        const budget = await budgetRepository.getOrCreateForActivePeriod({
+          user_id: user.id,
+          workspace_id: workspace.id,
+          financial_period_id: period.id,
+        });
+        budgetItem = await budgetItemRepository.findByCategory(
+          budget.id,
+          input.category_id,
+        );
+      }
 
       // 4. INSERT transaction.
       await transferTransactionRepository.create({
@@ -96,6 +117,9 @@ export function useTransferMoney() {
         to_account_id: input.to_account_id,
         to_pocket_id: input.to_pocket_id,
         financial_period_id: period?.id ?? null,
+        category_id: input.category_id,
+        budget_item_id: budgetItem?.id ?? null,
+        affects_budget: Boolean(input.category_id),
       });
 
       // 5. UPDATE bolsillos.
@@ -125,16 +149,22 @@ export function useTransferMoney() {
         if (e2) throw e2;
       }
 
+      // 7. Ejecución del presupuesto si aplica.
+      if (budgetItem) {
+        await budgetItemRepository.applyExpense(budgetItem, input.amount);
+      }
+
       // Silenciar warning de linter (accountRepository importado como fuente
       // canónica de operaciones sobre cuentas — reutilizable a futuro).
       void accountRepository;
 
-      return { type };
+      return { type, linkedToBudget: Boolean(budgetItem) };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["movements"] });
       qc.invalidateQueries({ queryKey: ["accounts"] });
       qc.invalidateQueries({ queryKey: ["income"] });
+      qc.invalidateQueries({ queryKey: ["budget"] });
     },
   });
 }

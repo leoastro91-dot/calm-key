@@ -9,6 +9,8 @@ import {
   parseMoneyInput,
 } from "@/features/accounts/domain/types";
 import type { Account, Pocket } from "@/features/accounts/domain/types";
+import type { Category } from "@/features/budget/domain/types";
+import { CategoryPickerByBlock } from "@/features/budget/components/CategoryPickerByBlock";
 import { PocketSelector } from "./PocketSelector";
 import { ProtectedPocketWarning } from "./ProtectedPocketWarning";
 import { useTransferMoney } from "../hooks/useTransferMoney";
@@ -16,11 +18,18 @@ import { useTransferMoney } from "../hooks/useTransferMoney";
 interface Props {
   accounts: Account[];
   pockets: Pocket[];
+  categories: Category[];
   onDone: () => void;
   onCancel: () => void;
 }
 
-export function TransferForm({ accounts, pockets, onDone, onCancel }: Props) {
+export function TransferForm({
+  accounts,
+  pockets,
+  categories,
+  onDone,
+  onCancel,
+}: Props) {
   const activeAccounts = accounts.filter((a) => a.is_active);
   const activePockets = pockets.filter((p) => p.is_active);
 
@@ -38,6 +47,7 @@ export function TransferForm({ accounts, pockets, onDone, onCancel }: Props) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(toISODate(new Date()));
   const [note, setNote] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const transfer = useTransferMoney();
@@ -97,11 +107,14 @@ export function TransferForm({ accounts, pockets, onDone, onCancel }: Props) {
         from_pocket_id: fromPocketId,
         to_account_id: toAccountId,
         to_pocket_id: toPocketId,
+        category_id: categoryId || null,
       });
       toast(
         result.type === "emergency_use"
           ? "Uso de emergencia registrado."
-          : "Traslado registrado.",
+          : result.linkedToBudget
+            ? "Traslado registrado y sumado a tu presupuesto."
+            : "Traslado registrado.",
         "success",
       );
       onDone();
@@ -173,6 +186,21 @@ export function TransferForm({ accounts, pockets, onDone, onCancel }: Props) {
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
+
+      <div className="flex flex-col gap-1.5">
+        <CategoryPickerByBlock
+          id="transfer-category"
+          categories={categories}
+          excludeCategoryIds={[]}
+          value={categoryId}
+          onChange={setCategoryId}
+        />
+        <p className="text-xs text-muted-foreground">
+          Opcional. Si este traslado es parte de tu presupuesto (por ejemplo,
+          mover dinero a tu Fondo de emergencia o Ahorro programado), elige la
+          categoría para que cuente como ejecución en el período activo.
+        </p>
+      </div>
 
       <Input
         label="Nota (opcional)"
