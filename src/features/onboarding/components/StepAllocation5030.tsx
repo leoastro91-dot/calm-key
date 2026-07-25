@@ -1,4 +1,4 @@
-import { PercentageSplitInput } from "./PercentageSplitInput";
+import { PercentageSplitInput } from "@/features/shared/components/PercentageSplitInput";
 import type { OnboardingState } from "../hooks/useOnboardingWizard";
 
 interface Props {

@@ -45,4 +45,25 @@ export const financialProfileRepository = {
       .eq("id", id);
     if (error) throw error;
   },
+
+  /**
+   * LOVABLE-008 — actualiza solo los 3 porcentajes 50/30/20.
+   * Cliente valida suma=100; la DB refuerza vía chk_pct_sum.
+   */
+  async updateDistribution(
+    id: string,
+    input: { needs_pct: number; wants_pct: number; construction_pct: number },
+  ): Promise<void> {
+    const sum = input.needs_pct + input.wants_pct + input.construction_pct;
+    if (sum !== 100) throw new Error("PCT_SUM_MUST_BE_100");
+    const { error } = await getSupabase()
+      .from("financial_profiles")
+      .update({
+        needs_pct: input.needs_pct,
+        wants_pct: input.wants_pct,
+        construction_pct: input.construction_pct,
+      })
+      .eq("id", id);
+    if (error) throw error;
+  },
 };
