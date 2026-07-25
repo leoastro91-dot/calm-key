@@ -4,10 +4,14 @@
  * Secuencia:
  *   1. Validar monto_total > 0, ≤ saldo del bolsillo; abono_capital > 0,
  *      ≤ monto_total y ≤ saldo pendiente de la deuda.
- *   2. INSERT transactions (type='debt_payment', amount=monto_total, debt_id).
- *   3. UPDATE pockets.balance -= monto_total y accounts.current_balance -= monto_total.
- *   4. UPDATE debts.current_balance -= abono_capital;
+ *   2. Si hay category_id: buscar budget_item de esa categoría en el
+ *      presupuesto activo (puede no existir — no es error).
+ *   3. INSERT transactions (type='debt_payment', amount=monto_total, debt_id,
+ *      + category_id/budget_item_id/affects_budget si aplica).
+ *   4. UPDATE pockets.balance -= monto_total y accounts.current_balance -= monto_total.
+ *   5. UPDATE debts.current_balance -= abono_capital;
  *      status='paid' si el nuevo saldo llega a 0.
+ *   6. Si hay budget_item: aplicar monto_total como ejecución del presupuesto.
  *
  * Invariante: accounts.current_balance = SUM(pockets.balance) tras el abono.
  * debts.current_balance nunca queda negativo (validado en el paso 1).
@@ -18,6 +22,8 @@ import { useWorkspace } from "@/features/identity/hooks/useWorkspace";
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 import { pocketRepository } from "@/features/accounts/services/pocketRepository";
 import { financialPeriodRepository } from "@/features/income/services/financialPeriodRepository";
+import { budgetRepository } from "@/features/budget/services/budgetRepository";
+import { budgetItemRepository } from "@/features/budget/services/budgetItemRepository";
 import { debtRepository } from "../services/debtRepository";
 import { debtTransactionRepository } from "../services/transactionRepository";
 
@@ -29,6 +35,7 @@ export interface RegisterDebtPaymentInput {
   description: string | null;
   account_id: string;
   pocket_id: string;
+  category_id: string | null;
 }
 
 async function fetchPocketBalance(id: string): Promise<number> {
@@ -82,7 +89,23 @@ export function useRegisterDebtPayment() {
         workspace.id,
       );
 
-      // 2. INSERT transaction.
+      // 2. Buscar budget_item si hay categoría y período activo.
+      let budgetItem = null as Awaited<
+        ReturnType<typeof budgetItemRepository.findByCategory>
+      >;
+      if (input.category_id && period) {
+        const budget = await budgetRepository.getOrCreateForActivePeriod({
+          user_id: user.id,
+          workspace_id: workspace.id,
+          financial_period_id: period.id,
+        });
+        budgetItem = await budgetItemRepository.findByCategory(
+          budget.id,
+          input.category_id,
+        );
+      }
+
+      // 3. INSERT transaction.
       await debtTransactionRepository.createDebtPayment({
         user_id: user.id,
         workspace_id: workspace.id,
@@ -93,9 +116,12 @@ export function useRegisterDebtPayment() {
         pocket_id: input.pocket_id,
         debt_id: input.debt_id,
         financial_period_id: period?.id ?? null,
+        category_id: input.category_id,
+        budget_item_id: budgetItem?.id ?? null,
+        affects_budget: Boolean(budgetItem),
       });
 
-      // 3. UPDATE bolsillo y cuenta por monto_total.
+      // 4. UPDATE bolsillo y cuenta por monto_total.
       await pocketRepository.setBalance(
         input.pocket_id,
         pocketBalance - input.amount_total,
@@ -107,7 +133,7 @@ export function useRegisterDebtPayment() {
         .eq("id", input.account_id);
       if (acctErr) throw acctErr;
 
-      // 4. UPDATE deuda por abono_capital, marcar 'paid' si llega a 0.
+      // 5. UPDATE deuda por abono_capital, marcar 'paid' si llega a 0.
       const newDebt = Math.max(0, currentDebt - input.amount_capital);
       const newStatus = newDebt <= 0 ? "paid" : "active";
       await debtRepository.setBalanceAndStatus(
@@ -116,7 +142,15 @@ export function useRegisterDebtPayment() {
         newStatus,
       );
 
-      return { paid: newStatus === "paid" };
+      // 6. Ejecución de presupuesto si aplica (monto total pagado).
+      if (budgetItem) {
+        await budgetItemRepository.applyExpense(budgetItem, input.amount_total);
+      }
+
+      return {
+        paid: newStatus === "paid",
+        linkedToBudget: Boolean(budgetItem),
+      };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["debts"] });
@@ -124,6 +158,7 @@ export function useRegisterDebtPayment() {
       qc.invalidateQueries({ queryKey: ["movements"] });
       qc.invalidateQueries({ queryKey: ["expenses"] });
       qc.invalidateQueries({ queryKey: ["income"] });
+      qc.invalidateQueries({ queryKey: ["budget"] });
     },
   });
 }
