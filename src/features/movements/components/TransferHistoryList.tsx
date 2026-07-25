@@ -58,6 +58,7 @@ export function TransferHistoryList({ items }: Props) {
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
                   {formatDateEs(it.date)}
+                  {it.category ? ` · ${it.category.name}` : ""}
                   {it.description ? ` · ${it.description}` : ""}
                 </p>
               </div>

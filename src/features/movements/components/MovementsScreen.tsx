@@ -9,7 +9,7 @@ import { TransferForm } from "./TransferForm";
 import { TransferHistoryList } from "./TransferHistoryList";
 
 export function MovementsScreen() {
-  const { items, accounts, pockets, isLoading, isError, refetch } =
+  const { items, accounts, pockets, categories, isLoading, isError, refetch } =
     useTransferHistory();
   const [showForm, setShowForm] = useState(false);
 
@@ -63,6 +63,7 @@ export function MovementsScreen() {
           <TransferForm
             accounts={accounts}
             pockets={pockets}
+            categories={categories}
             onDone={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}
           />
