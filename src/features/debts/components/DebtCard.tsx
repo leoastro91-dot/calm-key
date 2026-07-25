@@ -4,6 +4,7 @@ import { Card } from "@/features/shared/components/Card";
 import { Button } from "@/features/shared/components/Button";
 import { formatMoney } from "@/features/accounts/domain/types";
 import type { Account, Pocket } from "@/features/accounts/domain/types";
+import type { Category } from "@/features/budget/domain/types";
 import { DEBT_STATUS_LABELS, paidProgress, type Debt } from "../domain/types";
 import { RegisterPaymentForm } from "./RegisterPaymentForm";
 import { PaymentHistoryList } from "./PaymentHistoryList";
@@ -12,9 +13,10 @@ interface Props {
   debt: Debt;
   accounts: Account[];
   pockets: Pocket[];
+  categories: Category[];
 }
 
-export function DebtCard({ debt, accounts, pockets }: Props) {
+export function DebtCard({ debt, accounts, pockets, categories }: Props) {
   const [payOpen, setPayOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const { paid, pct } = paidProgress(debt);
@@ -130,6 +132,7 @@ export function DebtCard({ debt, accounts, pockets }: Props) {
             debt={debt}
             accounts={accounts}
             pockets={pockets}
+            categories={categories}
             onDone={() => setPayOpen(false)}
             onCancel={() => setPayOpen(false)}
           />

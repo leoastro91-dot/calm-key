@@ -1,6 +1,7 @@
 import { Inbox } from "lucide-react";
 import { Card } from "@/features/shared/components/Card";
 import type { Account, Pocket } from "@/features/accounts/domain/types";
+import type { Category } from "@/features/budget/domain/types";
 import type { Debt } from "../domain/types";
 import { DebtCard } from "./DebtCard";
 
@@ -9,10 +10,18 @@ interface Props {
   debts: Debt[];
   accounts: Account[];
   pockets: Pocket[];
+  categories: Category[];
   emptyText?: string;
 }
 
-export function DebtList({ title, debts, accounts, pockets, emptyText }: Props) {
+export function DebtList({
+  title,
+  debts,
+  accounts,
+  pockets,
+  categories,
+  emptyText,
+}: Props) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
@@ -29,7 +38,12 @@ export function DebtList({ title, debts, accounts, pockets, emptyText }: Props) 
         <ul className="flex flex-col gap-3">
           {debts.map((d) => (
             <li key={d.id}>
-              <DebtCard debt={d} accounts={accounts} pockets={pockets} />
+              <DebtCard
+                debt={d}
+                accounts={accounts}
+                pockets={pockets}
+                categories={categories}
+              />
             </li>
           ))}
         </ul>

@@ -9,6 +9,8 @@ import {
   parseMoneyInput,
 } from "@/features/accounts/domain/types";
 import type { Account, Pocket } from "@/features/accounts/domain/types";
+import type { Category } from "@/features/budget/domain/types";
+import { CategoryPickerByBlock } from "@/features/budget/components/CategoryPickerByBlock";
 import { PocketSelector } from "@/features/movements/components/PocketSelector";
 import type { Debt } from "../domain/types";
 import { useRegisterDebtPayment } from "../hooks/useRegisterDebtPayment";
@@ -17,6 +19,7 @@ interface Props {
   debt: Debt;
   accounts: Account[];
   pockets: Pocket[];
+  categories: Category[];
   onDone: () => void;
   onCancel: () => void;
 }
@@ -25,6 +28,7 @@ export function RegisterPaymentForm({
   debt,
   accounts,
   pockets,
+  categories,
   onDone,
   onCancel,
 }: Props) {
@@ -43,6 +47,7 @@ export function RegisterPaymentForm({
   const [capitalTouched, setCapitalTouched] = useState(false);
   const [date, setDate] = useState(toISODate(new Date()));
   const [note, setNote] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const register = useRegisterDebtPayment();
@@ -112,11 +117,14 @@ export function RegisterPaymentForm({
         description: note.trim() || null,
         account_id: accountId,
         pocket_id: pocketId,
+        category_id: categoryId || null,
       });
       toast(
         result.paid
           ? "¡Deuda saldada! Marcada como pagada."
-          : "Abono registrado.",
+          : result.linkedToBudget
+            ? "Abono registrado y sumado a tu presupuesto."
+            : "Abono registrado.",
         "success",
       );
       onDone();
