@@ -110,6 +110,11 @@ export function WelcomeCard() {
                 Ir a mis cuentas y bolsillos
               </Button>
             </Link>
+            <Link to="/deudas" className="w-full">
+              <Button variant="secondary" fullWidth>
+                Ver mis deudas
+              </Button>
+            </Link>
             <Link to="/configuracion" className="w-full">
               <Button variant="ghost" fullWidth>
                 Ajustar mi distribución 50/30/20
