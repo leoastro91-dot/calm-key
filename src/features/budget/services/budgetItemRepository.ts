@@ -51,9 +51,24 @@ export const budgetItemRepository = {
   },
 
   async updateProjected(id: string, projected_amount: number): Promise<void> {
+    // Releer actual_amount para recalcular pct y sobre-ejecución con el
+    // nuevo proyectado — si no, el badge sigue mostrando el % viejo.
+    const { data: current, error: readErr } = await getSupabase()
+      .from("budget_items")
+      .select("actual_amount")
+      .eq("id", id)
+      .single();
+    if (readErr) throw readErr;
+    const actual = Number((current as { actual_amount: number }).actual_amount) || 0;
+    const pct = projected_amount > 0 ? (actual / projected_amount) * 100 : 0;
+    const overspend = Math.max(0, actual - projected_amount);
     const { error } = await getSupabase()
       .from("budget_items")
-      .update({ projected_amount })
+      .update({
+        projected_amount,
+        current_execution_pct: pct,
+        overspend_amount: overspend,
+      })
       .eq("id", id);
     if (error) throw error;
   },
