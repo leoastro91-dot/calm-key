@@ -59,7 +59,7 @@ export const transferTransactionRepository = {
       .eq("workspace_id", workspaceId)
       .in("type", ["transfer", "emergency_use"])
       .order("date", { ascending: false })
-      .order("id", { ascending: false });
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return (data as TransferRow[]) ?? [];
   },
