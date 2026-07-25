@@ -95,6 +95,11 @@ export function WelcomeCard() {
                 Planear mi presupuesto
               </Button>
             </Link>
+            <Link to="/gastos" className="w-full">
+              <Button variant="secondary" fullWidth>
+                Registrar un gasto
+              </Button>
+            </Link>
             <Link to="/movimientos" className="w-full">
               <Button variant="secondary" fullWidth>
                 Trasladar dinero entre bolsillos
