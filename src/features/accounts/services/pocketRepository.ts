@@ -4,7 +4,7 @@ import type { MoneyState, Pocket } from "../domain/types";
 import { GENERAL_POCKET_NAME } from "../domain/types";
 
 const COLS =
-  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active";
+  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active, target_amount";
 
 export const pocketRepository = {
   async listByWorkspace(
