@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPresupuestoRouteImport } from './routes/_authenticated/presupuesto'
 import { Route as AuthenticatedMovimientosRouteImport } from './routes/_authenticated/movimientos'
 import { Route as AuthenticatedIngresosRouteImport } from './routes/_authenticated/ingresos'
+import { Route as AuthenticatedGastosRouteImport } from './routes/_authenticated/gastos'
 import { Route as AuthenticatedCuentasRouteImport } from './routes/_authenticated/cuentas'
 import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
 import { Route as AuthenticatedOnboardingIndexRouteImport } from './routes/_authenticated/onboarding.index'
@@ -75,6 +76,11 @@ const AuthenticatedIngresosRoute = AuthenticatedIngresosRouteImport.update({
   path: '/ingresos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGastosRoute = AuthenticatedGastosRouteImport.update({
+  id: '/gastos',
+  path: '/gastos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCuentasRoute = AuthenticatedCuentasRouteImport.update({
   id: '/cuentas',
   path: '/cuentas',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
+  '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
   '/movimientos': typeof AuthenticatedMovimientosRoute
   '/presupuesto': typeof AuthenticatedPresupuestoRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
+  '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
   '/movimientos': typeof AuthenticatedMovimientosRoute
   '/presupuesto': typeof AuthenticatedPresupuestoRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/_authenticated/cuentas': typeof AuthenticatedCuentasRoute
+  '/_authenticated/gastos': typeof AuthenticatedGastosRoute
   '/_authenticated/ingresos': typeof AuthenticatedIngresosRoute
   '/_authenticated/movimientos': typeof AuthenticatedMovimientosRoute
   '/_authenticated/presupuesto': typeof AuthenticatedPresupuestoRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/bienvenida'
     | '/cuentas'
+    | '/gastos'
     | '/ingresos'
     | '/movimientos'
     | '/presupuesto'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/bienvenida'
     | '/cuentas'
+    | '/gastos'
     | '/ingresos'
     | '/movimientos'
     | '/presupuesto'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/bienvenida'
     | '/_authenticated/cuentas'
+    | '/_authenticated/gastos'
     | '/_authenticated/ingresos'
     | '/_authenticated/movimientos'
     | '/_authenticated/presupuesto'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIngresosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gastos': {
+      id: '/_authenticated/gastos'
+      path: '/gastos'
+      fullPath: '/gastos'
+      preLoaderRoute: typeof AuthenticatedGastosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/cuentas': {
       id: '/_authenticated/cuentas'
       path: '/cuentas'
@@ -310,6 +329,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
   AuthenticatedCuentasRoute: typeof AuthenticatedCuentasRoute
+  AuthenticatedGastosRoute: typeof AuthenticatedGastosRoute
   AuthenticatedIngresosRoute: typeof AuthenticatedIngresosRoute
   AuthenticatedMovimientosRoute: typeof AuthenticatedMovimientosRoute
   AuthenticatedPresupuestoRoute: typeof AuthenticatedPresupuestoRoute
@@ -320,6 +340,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
   AuthenticatedCuentasRoute: AuthenticatedCuentasRoute,
+  AuthenticatedGastosRoute: AuthenticatedGastosRoute,
   AuthenticatedIngresosRoute: AuthenticatedIngresosRoute,
   AuthenticatedMovimientosRoute: AuthenticatedMovimientosRoute,
   AuthenticatedPresupuestoRoute: AuthenticatedPresupuestoRoute,

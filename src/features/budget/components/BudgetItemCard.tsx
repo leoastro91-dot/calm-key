@@ -4,6 +4,7 @@ import { Input } from "@/features/shared/components/Input";
 import { Button } from "@/features/shared/components/Button";
 import { formatMoney, parseMoneyInput } from "@/features/accounts/domain/types";
 import { useToast } from "@/features/shared/components/Toast";
+import { BudgetExecutionBadge } from "@/features/expenses/components/BudgetExecutionBadge";
 import type { BudgetItemWithCategory } from "../domain/types";
 import {
   useDeleteBudgetItem,
@@ -57,9 +58,16 @@ export function BudgetItemCard({ item, currency }: Props) {
     <li className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-foreground">
-            {item.category?.name ?? "Categoría"}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="truncate text-sm font-semibold text-foreground">
+              {item.category?.name ?? "Categoría"}
+            </p>
+            <BudgetExecutionBadge
+              pct={Number(item.current_execution_pct)}
+              warning={Number(item.alert_threshold_warning) || 50}
+              critical={Number(item.alert_threshold_critical) || 80}
+            />
+          </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Ejecutado: {formatMoney(Number(item.actual_amount), currency)}
           </p>

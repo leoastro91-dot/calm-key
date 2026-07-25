@@ -1,6 +1,7 @@
 /**
  * Repository (ADR-001) — budget_items. CRUD del plan por categoría.
- * actual_amount siempre queda en 0 hasta LOVABLE-007 (gastos).
+ * Extendido en LOVABLE-007 con findByCategory() y applyExpense() para
+ * mantener actual_amount / current_execution_pct / overspend_amount al día.
  */
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { BudgetItem } from "../domain/types";
@@ -62,6 +63,44 @@ export const budgetItemRepository = {
       .from("budget_items")
       .delete()
       .eq("id", id);
+    if (error) throw error;
+  },
+
+  /**
+   * Busca la línea de presupuesto de una categoría dentro de un budget dado.
+   * Devuelve null si no existe (no es error — el gasto se registra igual).
+   */
+  async findByCategory(
+    budgetId: string,
+    categoryId: string,
+  ): Promise<BudgetItem | null> {
+    const { data, error } = await getSupabase()
+      .from("budget_items")
+      .select(COLS)
+      .eq("budget_id", budgetId)
+      .eq("category_id", categoryId)
+      .maybeSingle();
+    if (error) throw error;
+    return (data as BudgetItem) ?? null;
+  },
+
+  /**
+   * Suma delta al actual_amount y recalcula porcentaje y sobre-ejecución.
+   * delta puede ser positivo (nuevo gasto) o negativo (reversión).
+   */
+  async applyExpense(item: BudgetItem, delta: number): Promise<void> {
+    const projected = Number(item.projected_amount) || 0;
+    const nuevo = Number(item.actual_amount) + delta;
+    const pct = projected > 0 ? (nuevo / projected) * 100 : 0;
+    const overspend = Math.max(0, nuevo - projected);
+    const { error } = await getSupabase()
+      .from("budget_items")
+      .update({
+        actual_amount: nuevo,
+        current_execution_pct: pct,
+        overspend_amount: overspend,
+      })
+      .eq("id", item.id);
     if (error) throw error;
   },
 };
