@@ -35,6 +35,8 @@ export function BudgetBlocksSummary({ blocks, profile, currency }: Props) {
         const projRatio = denom > 0 ? Math.min(agg.projected / denom, 1) : 0;
         const actRatio = denom > 0 ? Math.min(agg.actual / denom, 1) : 0;
         const over = agg.actual > agg.projected && agg.projected > 0;
+        const execPct =
+          target > 0 ? (agg.actual / target) * 100 : 0;
         return (
           <Card key={b} className={`flex flex-col gap-2 p-4 ${ACCENT[b]}`}>
             <div className="flex items-baseline justify-between gap-2">
@@ -66,6 +68,9 @@ export function BudgetBlocksSummary({ blocks, profile, currency }: Props) {
                   }`}
                 >
                   {formatMoney(agg.actual, currency)}
+                  <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                    · {execPct.toFixed(1)}%
+                  </span>
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
