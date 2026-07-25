@@ -25,7 +25,9 @@ export function GoalPocketCard({ goal, currency, onEdit, onRemove }: Props) {
           </span>
         </div>
         {goal.isComplete && (
-          <Badge tone="success">Meta cumplida</Badge>
+          <span className="inline-flex items-center rounded-full border border-success/30 bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success">
+            Meta cumplida
+          </span>
         )}
       </div>
 
