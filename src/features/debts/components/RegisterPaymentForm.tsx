@@ -217,6 +217,21 @@ export function RegisterPaymentForm({
         onChange={(e) => setDate(e.target.value)}
       />
 
+      <div className="flex flex-col gap-1.5">
+        <CategoryPickerByBlock
+          id="debt-payment-category"
+          categories={categories}
+          excludeCategoryIds={[]}
+          value={categoryId}
+          onChange={setCategoryId}
+        />
+        <p className="text-xs text-muted-foreground">
+          Opcional. Si tienes una categoría de "Pago de deudas" en tu
+          presupuesto del período, elígela para que este abono cuente como
+          ejecución.
+        </p>
+      </div>
+
       <Input
         label="Nota (opcional)"
         placeholder="Ej. Pago cuota julio"
