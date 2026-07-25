@@ -21,6 +21,7 @@ import { Route as AuthenticatedMovimientosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedIngresosRouteImport } from './routes/_authenticated/ingresos'
 import { Route as AuthenticatedGastosRouteImport } from './routes/_authenticated/gastos'
 import { Route as AuthenticatedDeudasRouteImport } from './routes/_authenticated/deudas'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCuentasRouteImport } from './routes/_authenticated/cuentas'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated/configuracion'
 import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
@@ -88,6 +89,11 @@ const AuthenticatedDeudasRoute = AuthenticatedDeudasRouteImport.update({
   path: '/deudas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCuentasRoute = AuthenticatedCuentasRouteImport.update({
   id: '/cuentas',
   path: '/cuentas',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/deudas': typeof AuthenticatedDeudasRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/cuentas': typeof AuthenticatedCuentasRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/deudas': typeof AuthenticatedDeudasRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/ingresos': typeof AuthenticatedIngresosRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
   '/_authenticated/cuentas': typeof AuthenticatedCuentasRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/deudas': typeof AuthenticatedDeudasRoute
   '/_authenticated/gastos': typeof AuthenticatedGastosRoute
   '/_authenticated/ingresos': typeof AuthenticatedIngresosRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/bienvenida'
     | '/configuracion'
     | '/cuentas'
+    | '/dashboard'
     | '/deudas'
     | '/gastos'
     | '/ingresos'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/bienvenida'
     | '/configuracion'
     | '/cuentas'
+    | '/dashboard'
     | '/deudas'
     | '/gastos'
     | '/ingresos'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bienvenida'
     | '/_authenticated/configuracion'
     | '/_authenticated/cuentas'
+    | '/_authenticated/dashboard'
     | '/_authenticated/deudas'
     | '/_authenticated/gastos'
     | '/_authenticated/ingresos'
@@ -327,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeudasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/cuentas': {
       id: '/_authenticated/cuentas'
       path: '/cuentas'
@@ -369,6 +388,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
   AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
   AuthenticatedCuentasRoute: typeof AuthenticatedCuentasRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDeudasRoute: typeof AuthenticatedDeudasRoute
   AuthenticatedGastosRoute: typeof AuthenticatedGastosRoute
   AuthenticatedIngresosRoute: typeof AuthenticatedIngresosRoute
@@ -382,6 +402,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
   AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
   AuthenticatedCuentasRoute: AuthenticatedCuentasRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDeudasRoute: AuthenticatedDeudasRoute,
   AuthenticatedGastosRoute: AuthenticatedGastosRoute,
   AuthenticatedIngresosRoute: AuthenticatedIngresosRoute,
