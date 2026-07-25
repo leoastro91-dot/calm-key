@@ -31,7 +31,7 @@ function SectionHeading({
   cta,
 }: {
   title: string;
-  href?: "/cuentas" | "/presupuesto" | "/ingresos" | "/gastos" | "/deudas";
+  href?: "/cuentas" | "/presupuesto" | "/ingresos" | "/gastos" | "/deudas" | "/metas";
   cta?: string;
 }) {
   return (
@@ -51,6 +51,9 @@ function SectionHeading({
 
 export function DashboardScreen() {
   const d = useDashboardData();
+  const goalsQ = useGoalPockets();
+
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -163,6 +166,19 @@ export function DashboardScreen() {
             expenses={d.recentExpenses}
             currency={d.currency}
           />
+        )}
+      </section>
+
+      {/* Metas por bolsillo */}
+      <section>
+        {goalsQ.isLoading ? (
+          <Card className="flex justify-center py-6">
+            <Spinner />
+          </Card>
+        ) : goalsQ.isError ? (
+          <SectionError>No pudimos cargar tus metas.</SectionError>
+        ) : (
+          <GoalsSummarySection goals={goalsQ.goals} currency={goalsQ.currency} />
         )}
       </section>
 
