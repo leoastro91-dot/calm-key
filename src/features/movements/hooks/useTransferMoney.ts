@@ -150,8 +150,17 @@ export function useTransferMoney() {
       }
 
       // 7. Ejecución del presupuesto si aplica.
+      //    - transfer (aporte a ahorro/construcción) suma ejecución.
+      //    - emergency_use (retiro de bolsillo protegido) revierte la
+      //      ejecución previa: el dinero deja de estar destinado a esa meta,
+      //      por eso el delta es negativo (nunca por debajo de 0).
       if (budgetItem) {
-        await budgetItemRepository.applyExpense(budgetItem, input.amount);
+        const rawDelta = type === "emergency_use" ? -input.amount : input.amount;
+        const current = Number(budgetItem.actual_amount) || 0;
+        const delta = Math.max(rawDelta, -current);
+        if (delta !== 0) {
+          await budgetItemRepository.applyExpense(budgetItem, delta);
+        }
       }
 
       // Silenciar warning de linter (accountRepository importado como fuente
