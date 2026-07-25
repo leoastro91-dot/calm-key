@@ -4,7 +4,7 @@ import type { MoneyState, Pocket } from "../domain/types";
 import { GENERAL_POCKET_NAME } from "../domain/types";
 
 const COLS =
-  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active";
+  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active, target_amount";
 
 export const pocketRepository = {
   async listByWorkspace(
@@ -71,6 +71,17 @@ export const pocketRepository = {
       .update({ balance })
       .eq("id", id);
     if (error) throw error;
+  },
+
+  async updateTarget(id: string, target_amount: number | null): Promise<Pocket> {
+    const { data, error } = await getSupabase()
+      .from("pockets")
+      .update({ target_amount })
+      .eq("id", id)
+      .select(COLS)
+      .single();
+    if (error) throw error;
+    return data as Pocket;
   },
 
   async deactivate(id: string): Promise<void> {

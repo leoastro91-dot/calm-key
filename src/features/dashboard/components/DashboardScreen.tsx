@@ -3,6 +3,7 @@ import { Alert } from "@/features/shared/components/Alert";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
 import { useDashboardData } from "../hooks/useDashboardData";
+import { useGoalPockets } from "@/features/goals/hooks/useGoalPockets";
 import { PatrimonySummary } from "./PatrimonySummary";
 import { MoneyStateGrid } from "./MoneyStateGrid";
 import { ActivePeriodProgress } from "./ActivePeriodProgress";
@@ -10,6 +11,7 @@ import { BudgetBlocksSummary } from "./BudgetBlocksSummary";
 import { RealDistributionComparison } from "./RealDistributionComparison";
 import { RecentExpensesList } from "./RecentExpensesList";
 import { DebtsSummaryCard } from "./DebtsSummaryCard";
+import { GoalsSummarySection } from "./GoalsSummarySection";
 
 function SectionEmpty({ children }: { children: React.ReactNode }) {
   return (
@@ -29,7 +31,7 @@ function SectionHeading({
   cta,
 }: {
   title: string;
-  href?: "/cuentas" | "/presupuesto" | "/ingresos" | "/gastos" | "/deudas";
+  href?: "/cuentas" | "/presupuesto" | "/ingresos" | "/gastos" | "/deudas" | "/metas";
   cta?: string;
 }) {
   return (
@@ -49,6 +51,9 @@ function SectionHeading({
 
 export function DashboardScreen() {
   const d = useDashboardData();
+  const goalsQ = useGoalPockets();
+
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,6 +166,19 @@ export function DashboardScreen() {
             expenses={d.recentExpenses}
             currency={d.currency}
           />
+        )}
+      </section>
+
+      {/* Metas por bolsillo */}
+      <section>
+        {goalsQ.isLoading ? (
+          <Card className="flex justify-center py-6">
+            <Spinner />
+          </Card>
+        ) : goalsQ.isError ? (
+          <SectionError>No pudimos cargar tus metas.</SectionError>
+        ) : (
+          <GoalsSummarySection goals={goalsQ.goals} currency={goalsQ.currency} />
         )}
       </section>
 
