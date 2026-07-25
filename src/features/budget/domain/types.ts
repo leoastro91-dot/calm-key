@@ -14,7 +14,6 @@ export interface Category {
   block_5030: Block5030;
   is_system: boolean;
   icon: string | null;
-  color: string | null;
 }
 
 export interface Budget {

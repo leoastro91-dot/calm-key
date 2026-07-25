@@ -6,7 +6,7 @@ import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { Block5030, Category } from "../domain/types";
 
 const COLS =
-  "id, user_id, workspace_id, name, block_5030, is_system, icon, color";
+  "id, user_id, workspace_id, name, block_5030, is_system, icon";
 
 export const categoryRepository = {
   /** Todas las categorías disponibles para este usuario: sistema + propias. */
