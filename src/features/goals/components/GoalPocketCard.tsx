@@ -1,6 +1,5 @@
 import { Card } from "@/features/shared/components/Card";
 import { Button } from "@/features/shared/components/Button";
-import { Badge } from "@/features/shared/components/Badge";
 import { formatMoney } from "@/features/accounts/domain/types";
 import type { GoalPocket } from "../domain/types";
 import { GoalProgressBar } from "./GoalProgressBar";
