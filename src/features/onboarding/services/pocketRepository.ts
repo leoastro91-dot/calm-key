@@ -3,7 +3,7 @@ import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { MoneyState, Pocket } from "../domain/types";
 
 const COLS =
-  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active";
+  "id, account_id, user_id, workspace_id, name, money_state, balance, is_active, target_amount";
 
 export const pocketRepository = {
   async create(input: {
