@@ -85,9 +85,9 @@ export function RealDistributionComparison({
               <div className="flex items-center gap-3">
                 <div className="flex flex-col items-end tabular-numbers">
                   <span className="text-base font-semibold text-foreground">
-                    {realPct.toFixed(0)}%{" "}
+                    {realPct.toFixed(1)}% de tu gasto total{" "}
                     <span className="text-xs font-normal text-muted-foreground">
-                      / meta {target}%
+                      (meta {target}%)
                     </span>
                   </span>
                   <span className={`text-xs ${tone}`}>
