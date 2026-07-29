@@ -17,6 +17,7 @@ import { Route as ActualizarPasswordRouteImport } from './routes/actualizar-pass
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPresupuestoRouteImport } from './routes/_authenticated/presupuesto'
+import { Route as AuthenticatedPrestamosRouteImport } from './routes/_authenticated/prestamos'
 import { Route as AuthenticatedMovimientosRouteImport } from './routes/_authenticated/movimientos'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedIngresosRouteImport } from './routes/_authenticated/ingresos'
@@ -69,6 +70,11 @@ const AuthenticatedPresupuestoRoute =
     path: '/presupuesto',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPrestamosRoute = AuthenticatedPrestamosRouteImport.update({
+  id: '/prestamos',
+  path: '/prestamos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMovimientosRoute =
   AuthenticatedMovimientosRouteImport.update({
     id: '/movimientos',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/ingresos': typeof AuthenticatedIngresosRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/movimientos': typeof AuthenticatedMovimientosRoute
+  '/prestamos': typeof AuthenticatedPrestamosRoute
   '/presupuesto': typeof AuthenticatedPresupuestoRoute
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/onboarding/': typeof AuthenticatedOnboardingIndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/ingresos': typeof AuthenticatedIngresosRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/movimientos': typeof AuthenticatedMovimientosRoute
+  '/prestamos': typeof AuthenticatedPrestamosRoute
   '/presupuesto': typeof AuthenticatedPresupuestoRoute
   '/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/onboarding': typeof AuthenticatedOnboardingIndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_authenticated/ingresos': typeof AuthenticatedIngresosRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/movimientos': typeof AuthenticatedMovimientosRoute
+  '/_authenticated/prestamos': typeof AuthenticatedPrestamosRoute
   '/_authenticated/presupuesto': typeof AuthenticatedPresupuestoRoute
   '/_authenticated/onboarding/completado': typeof AuthenticatedOnboardingCompletadoRoute
   '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/ingresos'
     | '/metas'
     | '/movimientos'
+    | '/prestamos'
     | '/presupuesto'
     | '/onboarding/completado'
     | '/onboarding/'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/ingresos'
     | '/metas'
     | '/movimientos'
+    | '/prestamos'
     | '/presupuesto'
     | '/onboarding/completado'
     | '/onboarding'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ingresos'
     | '/_authenticated/metas'
     | '/_authenticated/movimientos'
+    | '/_authenticated/prestamos'
     | '/_authenticated/presupuesto'
     | '/_authenticated/onboarding/completado'
     | '/_authenticated/onboarding/'
@@ -321,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/presupuesto'
       fullPath: '/presupuesto'
       preLoaderRoute: typeof AuthenticatedPresupuestoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/prestamos': {
+      id: '/_authenticated/prestamos'
+      path: '/prestamos'
+      fullPath: '/prestamos'
+      preLoaderRoute: typeof AuthenticatedPrestamosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/movimientos': {
@@ -413,6 +432,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIngresosRoute: typeof AuthenticatedIngresosRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedMovimientosRoute: typeof AuthenticatedMovimientosRoute
+  AuthenticatedPrestamosRoute: typeof AuthenticatedPrestamosRoute
   AuthenticatedPresupuestoRoute: typeof AuthenticatedPresupuestoRoute
   AuthenticatedOnboardingCompletadoRoute: typeof AuthenticatedOnboardingCompletadoRoute
   AuthenticatedOnboardingIndexRoute: typeof AuthenticatedOnboardingIndexRoute
@@ -428,6 +448,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIngresosRoute: AuthenticatedIngresosRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedMovimientosRoute: AuthenticatedMovimientosRoute,
+  AuthenticatedPrestamosRoute: AuthenticatedPrestamosRoute,
   AuthenticatedPresupuestoRoute: AuthenticatedPresupuestoRoute,
   AuthenticatedOnboardingCompletadoRoute:
     AuthenticatedOnboardingCompletadoRoute,
