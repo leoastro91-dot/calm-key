@@ -66,11 +66,17 @@ export const pocketRepository = {
   },
 
   async setBalance(id: string, balance: number): Promise<void> {
-    const { error } = await getSupabase()
+    const { data, error } = await getSupabase()
       .from("pockets")
       .update({ balance })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id, balance");
     if (error) throw error;
+    // Si RLS o un id inválido impiden el UPDATE, Supabase devuelve 0 filas
+    // sin error: eso dejaría el dinero sin moverse en silencio.
+    if (!data || data.length === 0) {
+      throw new Error("POCKET_BALANCE_UPDATE_FAILED");
+    }
   },
 
   async updateTarget(id: string, target_amount: number | null): Promise<Pocket> {
