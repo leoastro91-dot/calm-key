@@ -118,6 +118,12 @@ export function WelcomeCard() {
                 Ver mis deudas
               </Button>
             </Link>
+            <Link to="/prestamos" className="w-full">
+              <Button variant="secondary" fullWidth>
+                Ver préstamos a terceros
+              </Button>
+            </Link>
+
             <Link to="/metas" className="w-full">
               <Button variant="secondary" fullWidth>
                 Configurar mis metas por bolsillo
