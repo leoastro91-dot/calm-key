@@ -33,7 +33,7 @@ async function transactionTotalsByBudgetItem(
 
   const { data, error } = await getSupabase()
     .from("transactions")
-    .select("budget_item_id, amount")
+    .select("budget_item_id, amount, type")
     .in("budget_item_id", budgetItemIds)
     .eq("affects_budget", true)
     .not("category_id", "is", null);
@@ -41,11 +41,19 @@ async function transactionTotalsByBudgetItem(
   if (error) throw error;
 
   for (const row of data ?? []) {
-    const tx = row as { budget_item_id: string | null; amount: number };
+    const tx = row as {
+      budget_item_id: string | null;
+      amount: number;
+      type: string;
+    };
     if (!tx.budget_item_id) continue;
+    // 'emergency_use' libera dinero de esa categoría: resta ejecución.
+    // expense / debt_payment / transfer categorizados: suman.
+    const signed =
+      tx.type === "emergency_use" ? -Number(tx.amount) : Number(tx.amount);
     totals.set(
       tx.budget_item_id,
-      (totals.get(tx.budget_item_id) ?? 0) + Number(tx.amount),
+      (totals.get(tx.budget_item_id) ?? 0) + signed,
     );
   }
   return totals;

@@ -137,16 +137,20 @@ export function useTransferMoney() {
       if (input.from_account_id !== input.to_account_id) {
         const fromBal = await fetchAccountBalance(input.from_account_id);
         const toBal = await fetchAccountBalance(input.to_account_id);
-        const { error: e1 } = await getSupabase()
+        const { data: d1, error: e1 } = await getSupabase()
           .from("accounts")
           .update({ current_balance: fromBal - input.amount })
-          .eq("id", input.from_account_id);
+          .eq("id", input.from_account_id)
+          .select("id");
         if (e1) throw e1;
-        const { error: e2 } = await getSupabase()
+        if (!d1?.length) throw new Error("ACCOUNT_BALANCE_UPDATE_FAILED");
+        const { data: d2, error: e2 } = await getSupabase()
           .from("accounts")
           .update({ current_balance: toBal + input.amount })
-          .eq("id", input.to_account_id);
+          .eq("id", input.to_account_id)
+          .select("id");
         if (e2) throw e2;
+        if (!d2?.length) throw new Error("ACCOUNT_BALANCE_UPDATE_FAILED");
       }
 
       // 7. Ejecución del presupuesto si aplica.
