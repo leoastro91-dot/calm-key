@@ -33,6 +33,8 @@ export interface DebtPaymentRow {
   id: string;
   type: "debt_payment";
   amount: number;
+  /** Parte del monto total que fue interés (0 si no hubo interés). */
+  interest_amount: number | null;
   date: string;
   description: string | null;
   account_id: string;
@@ -44,6 +46,28 @@ export interface DebtPaymentHistoryItem extends DebtPaymentRow {
   account: Account | null;
   pocket: Pocket | null;
 }
+
+/** Totales acumulados de abonos de una deuda (derivados de transactions). */
+export interface DebtPaymentsSummary {
+  total: number;
+  capital: number;
+  interest: number;
+}
+
+export const EMPTY_PAYMENTS_SUMMARY: DebtPaymentsSummary = {
+  total: 0,
+  capital: 0,
+  interest: 0,
+};
+
+/** Parte de interés de un abono: monto total − abono a capital (piso en 0). */
+export function interestFromPayment(
+  amountTotal: number,
+  amountCapital: number,
+): number {
+  return Math.max(0, amountTotal - amountCapital);
+}
+
 
 /** Progreso pagado (capital_initial - current_balance) sobre capital_initial. */
 export function paidProgress(debt: Debt): {
