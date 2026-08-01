@@ -105,10 +105,16 @@ export const debtTransactionRepository = {
       const interest = Number(r.interest_amount ?? 0) || 0;
       const acc =
         map[r.debt_id] ??
-        (map[r.debt_id] = { total: 0, capital: 0, interest: 0 });
+        (map[r.debt_id] = {
+          total: 0,
+          capital: 0,
+          interest: 0,
+          interestPayments: 0,
+        });
       acc.total += total;
       acc.interest += interest;
       acc.capital += total - interest;
+      if (interest > 0) acc.interestPayments += 1;
     }
     return map;
   },
