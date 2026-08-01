@@ -6,6 +6,8 @@ import { formatMoney } from "@/features/accounts/domain/types";
 import type { Account, Pocket } from "@/features/accounts/domain/types";
 import type { Category } from "@/features/budget/domain/types";
 import { DEBT_STATUS_LABELS, paidProgress, type Debt } from "../domain/types";
+import { useDebtPaymentSummaries } from "../hooks/useDebtPaymentSummaries";
+import { PaymentsBreakdown } from "./PaymentsBreakdown";
 import { RegisterPaymentForm } from "./RegisterPaymentForm";
 import { PaymentHistoryList } from "./PaymentHistoryList";
 
@@ -25,6 +27,8 @@ export function DebtCard({ debt, accounts, pockets, categories }: Props) {
   const currency = "COP";
   const isPaid = debt.status === "paid";
   const hasActiveAccounts = accounts.some((a) => a.is_active);
+  const { getSummary } = useDebtPaymentSummaries();
+  const summary = getSummary(debt.id);
 
   return (
     <Card className="flex flex-col gap-4 p-5">
@@ -91,6 +95,8 @@ export function DebtCard({ debt, accounts, pockets, categories }: Props) {
           {debt.payment_day && <> · Día de pago: {debt.payment_day}</>}
         </p>
       </div>
+
+      <PaymentsBreakdown summary={summary} currency={currency} />
 
       {debt.notes && (
         <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">

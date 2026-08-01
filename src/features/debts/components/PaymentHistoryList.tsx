@@ -55,6 +55,9 @@ export function PaymentHistoryList({ debtId, currency, accounts, pockets }: Prop
       {items.map((it) => {
         const acct = accounts.find((a) => a.id === it.account_id) ?? null;
         const pocket = pockets.find((p) => p.id === it.pocket_id) ?? null;
+        const total = Number(it.amount);
+        const interest = Number(it.interest_amount ?? 0);
+        const capital = Math.max(0, total - interest);
         const source =
           acct && pocket ? `${acct.name} / ${pocket.name}` : "—";
         return (
@@ -75,9 +78,17 @@ export function PaymentHistoryList({ debtId, currency, accounts, pockets }: Prop
                   {it.description ? ` · ${it.description}` : ""}
                 </p>
               </div>
-              <p className="shrink-0 text-sm font-semibold text-destructive tabular-nums">
-                − {formatMoney(Number(it.amount), currency)}
-              </p>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-semibold text-destructive tabular-nums">
+                  − {formatMoney(total, currency)}
+                </p>
+                <p className="text-[11px] text-muted-foreground tabular-nums">
+                  Capital {formatMoney(capital, currency)}
+                  {interest > 0
+                    ? ` · Interés ${formatMoney(interest, currency)}`
+                    : " · Sin interés"}
+                </p>
+              </div>
             </Card>
           </li>
         );
