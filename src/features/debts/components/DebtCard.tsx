@@ -96,7 +96,7 @@ export function DebtCard({ debt, accounts, pockets, categories }: Props) {
         </p>
       </div>
 
-      <PaymentsBreakdown summary={summary} currency={currency} />
+      <PaymentsBreakdown summary={summary} currency={currency} debt={debt} />
 
       {debt.notes && (
         <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
