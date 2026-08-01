@@ -29,6 +29,7 @@ export function useDebtPaymentSummaries() {
       total: acc.total + s.total,
       capital: acc.capital + s.capital,
       interest: acc.interest + s.interest,
+      interestPayments: acc.interestPayments + s.interestPayments,
     }),
     { ...EMPTY_PAYMENTS_SUMMARY },
   );
