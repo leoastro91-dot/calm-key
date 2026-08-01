@@ -5,6 +5,8 @@ import { Button } from "@/features/shared/components/Button";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
 import { useDebts } from "../hooks/useDebts";
+import { useDebtPaymentSummaries } from "../hooks/useDebtPaymentSummaries";
+import { TotalInterestCard } from "./TotalInterestCard";
 import { CreateDebtForm } from "./CreateDebtForm";
 import { DebtList } from "./DebtList";
 
@@ -19,6 +21,7 @@ export function DebtsScreen() {
     isError,
     refetch,
   } = useDebts();
+  const { totals } = useDebtPaymentSummaries();
   const [showForm, setShowForm] = useState(false);
 
   if (isLoading) {
@@ -45,6 +48,8 @@ export function DebtsScreen() {
 
   return (
     <div className="flex flex-col gap-5">
+      <TotalInterestCard totals={totals} currency="COP" />
+
       {!showForm && (
         <Button onClick={() => setShowForm(true)} className="self-start">
           <Plus size={18} aria-hidden /> Agregar deuda
