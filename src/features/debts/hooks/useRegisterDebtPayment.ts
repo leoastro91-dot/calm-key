@@ -24,8 +24,10 @@ import { pocketRepository } from "@/features/accounts/services/pocketRepository"
 import { financialPeriodRepository } from "@/features/income/services/financialPeriodRepository";
 import { budgetRepository } from "@/features/budget/services/budgetRepository";
 import { budgetItemRepository } from "@/features/budget/services/budgetItemRepository";
+import { interestFromPayment } from "../domain/types";
 import { debtRepository } from "../services/debtRepository";
 import { debtTransactionRepository } from "../services/transactionRepository";
+
 
 export interface RegisterDebtPaymentInput {
   debt_id: string;
