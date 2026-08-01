@@ -105,11 +105,16 @@ export function useRegisterDebtPayment() {
         );
       }
 
-      // 3. INSERT transaction.
+      // 3. INSERT transaction (con desglose de interés persistido — v1.1).
+      const interest = interestFromPayment(
+        input.amount_total,
+        input.amount_capital,
+      );
       await debtTransactionRepository.createDebtPayment({
         user_id: user.id,
         workspace_id: workspace.id,
         amount: input.amount_total,
+        interest_amount: interest,
         date: input.date,
         description: input.description?.trim() ? input.description.trim() : null,
         account_id: input.account_id,
@@ -120,6 +125,7 @@ export function useRegisterDebtPayment() {
         budget_item_id: budgetItem?.id ?? null,
         affects_budget: Boolean(budgetItem),
       });
+
 
       // 4. UPDATE bolsillo y cuenta por monto_total.
       await pocketRepository.setBalance(
