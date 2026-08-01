@@ -52,13 +52,56 @@ export interface DebtPaymentsSummary {
   total: number;
   capital: number;
   interest: number;
+  /** Cantidad de abonos con interés > 0 (base del promedio de la tasa). */
+  interestPayments: number;
 }
 
 export const EMPTY_PAYMENTS_SUMMARY: DebtPaymentsSummary = {
   total: 0,
   capital: 0,
   interest: 0,
+  interestPayments: 0,
 };
+
+/**
+ * Tasa efectiva a partir de los abonos ya registrados.
+ * Interés promedio por abono ÷ deuda base × 100 = efectiva mensual (EM).
+ * EA = EM × 12 (lineal, como se pidió para el análisis rápido).
+ * Si el interés es fijo, el promedio es ese mismo interés.
+ */
+export interface DebtInterestRate {
+  avgInterest: number;
+  base: number;
+  monthlyPct: number;
+  annualPct: number;
+}
+
+export function interestRate(
+  debt: Debt,
+  summary: DebtPaymentsSummary,
+): DebtInterestRate | null {
+  if (summary.interestPayments <= 0 || summary.interest <= 0) return null;
+  // Deuda base: el capital sobre el que se cobra el interés hoy.
+  const base = Number(debt.current_balance) > 0
+    ? Number(debt.current_balance)
+    : Number(debt.capital_initial);
+  if (!base || base <= 0) return null;
+  const avgInterest = summary.interest / summary.interestPayments;
+  const monthlyPct = (avgInterest / base) * 100;
+  return {
+    avgInterest,
+    base,
+    monthlyPct,
+    annualPct: monthlyPct * 12,
+  };
+}
+
+export function formatPct(value: number): string {
+  return `${value.toLocaleString("es-CO", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}%`;
+}
 
 /** Parte de interés de un abono: monto total − abono a capital (piso en 0). */
 export function interestFromPayment(
