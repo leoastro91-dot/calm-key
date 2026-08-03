@@ -165,7 +165,8 @@ export function BudgetScreen() {
           <BudgetBlockSummary
             key={block}
             block={block}
-            projected={projectedByBlock[block]}
+            projected={byBlock[block].projected}
+            actual={byBlock[block].actual}
             profile={profileQ.data!}
             currency={currency}
           />
