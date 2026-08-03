@@ -10,6 +10,7 @@ import {
 interface Props {
   block: Block5030;
   projected: number;
+  actual: number;
   profile: {
     monthly_income: number;
     needs_pct: number;
@@ -28,6 +29,7 @@ const ACCENT: Record<Block5030, string> = {
 export function BudgetBlockSummary({
   block,
   projected,
+  actual,
   profile,
   currency,
 }: Props) {
@@ -35,6 +37,9 @@ export function BudgetBlockSummary({
   const pct = blockPct(block, profile);
   const ratio = target > 0 ? Math.min(projected / target, 1) : 0;
   const over = target > 0 && projected > target;
+  const availableToSpend = Math.max(0, projected - actual);
+  const overspend = Math.max(0, actual - projected);
+
 
   return (
     <Card className={`flex flex-col gap-2 p-4 ${ACCENT[block]}`}>

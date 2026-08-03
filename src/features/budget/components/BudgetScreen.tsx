@@ -72,15 +72,17 @@ export function BudgetScreen() {
     [itemsQ.data, categoriesById],
   );
 
-  const projectedByBlock = useMemo(() => {
-    const totals: Record<Block5030, number> = {
-      needs: 0,
-      wants: 0,
-      construction: 0,
+  const byBlock = useMemo(() => {
+    const totals: Record<Block5030, { projected: number; actual: number }> = {
+      needs: { projected: 0, actual: 0 },
+      wants: { projected: 0, actual: 0 },
+      construction: { projected: 0, actual: 0 },
     };
     for (const item of enrichedItems) {
       const block = item.category?.block_5030;
-      if (block) totals[block] += Number(item.projected_amount);
+      if (!block) continue;
+      totals[block].projected += Number(item.projected_amount);
+      totals[block].actual += Number(item.actual_amount);
     }
     return totals;
   }, [enrichedItems]);
