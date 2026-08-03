@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Alert } from "@/features/shared/components/Alert";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
+import { formatMoney } from "@/features/accounts/domain/types";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { useGoalPockets } from "@/features/goals/hooks/useGoalPockets";
 import { PatrimonySummary } from "./PatrimonySummary";
