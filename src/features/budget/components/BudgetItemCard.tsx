@@ -54,6 +54,18 @@ export function BudgetItemCard({ item, currency }: Props) {
     }
   };
 
+  const projected = Number(item.projected_amount);
+  const actual = Number(item.actual_amount);
+  const availableToSpend = Math.max(0, projected - actual);
+  const overspend = Math.max(0, actual - projected);
+  const pct = projected > 0 ? (actual / projected) * 100 : 0;
+  const stateLabel =
+    actual > projected
+      ? "Sobrepasado"
+      : actual === projected && projected > 0
+        ? "Consumido"
+        : "Disponible";
+
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -69,15 +81,29 @@ export function BudgetItemCard({ item, currency }: Props) {
             />
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Ejecutado: {formatMoney(Number(item.actual_amount), currency)}
+            Ejecutado presupuestal: {formatMoney(actual, currency)} ·{" "}
+            {pct.toFixed(1)}%
           </p>
+          <p className="mt-0.5 text-xs">
+            <span className="text-muted-foreground">Disponible: </span>
+            <span className="tabular-nums font-semibold text-foreground">
+              {formatMoney(availableToSpend, currency)}
+            </span>
+            <span className="ml-1.5 text-muted-foreground">· {stateLabel}</span>
+          </p>
+          {overspend > 0 && (
+            <p className="mt-0.5 text-xs font-medium text-destructive">
+              Sobrepaso: {formatMoney(overspend, currency)}
+            </p>
+          )}
         </div>
         {!editing && (
           <p className="tabular-nums text-base font-semibold text-foreground">
-            {formatMoney(Number(item.projected_amount), currency)}
+            {formatMoney(projected, currency)}
           </p>
         )}
       </div>
+
 
       {editing ? (
         <div className="flex flex-col gap-2">
