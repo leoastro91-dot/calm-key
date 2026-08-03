@@ -62,6 +62,8 @@ export function ExpenseForm({
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(toISODate(new Date()));
   const [nature, setNature] = useState<SpendingNature>("normal");
+  const [funding, setFunding] = useState<ExpenseFundingSource>("period_budget");
+  const [fundingTouched, setFundingTouched] = useState(false);
   const [description, setDescription] = useState("");
   const [eventTag, setEventTag] = useState("");
   const [error, setError] = useState<string | null>(null);
