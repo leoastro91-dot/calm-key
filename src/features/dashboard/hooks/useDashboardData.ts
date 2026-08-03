@@ -303,6 +303,7 @@ export function useDashboardData() {
     blocks,
     totalActual,
     recentExpenses,
+    fundUsageTotal,
     debtsSummary,
     status: {
       accounts: {
