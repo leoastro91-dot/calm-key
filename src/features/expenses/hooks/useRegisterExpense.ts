@@ -80,7 +80,8 @@ export function useRegisterExpense() {
       let budgetItem = null as Awaited<
         ReturnType<typeof budgetItemRepository.findByCategory>
       >;
-      if (period) {
+      // Sólo tocamos presupuesto cuando el gasto se financia con el ciclo.
+      if (period && input.affects_budget) {
         const budget = await budgetRepository.getOrCreateForActivePeriod({
           user_id: user.id,
           workspace_id: workspace.id,
