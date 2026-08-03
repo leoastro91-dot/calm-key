@@ -79,6 +79,20 @@ export function BudgetBlocksSummary({ blocks, profile, currency }: Props) {
                   style={{ width: `${Math.max(actRatio * 100, 2)}%` }}
                 />
               </div>
+              <div className="mt-1 flex items-baseline justify-between tabular-numbers">
+                <span className="text-muted-foreground">Disponible</span>
+                <span className="font-semibold text-foreground">
+                  {formatMoney(Math.max(0, agg.projected - agg.actual), currency)}
+                </span>
+              </div>
+              {agg.actual > agg.projected && (
+                <div className="flex items-baseline justify-between tabular-numbers">
+                  <span className="text-muted-foreground">Sobrepaso</span>
+                  <span className="font-semibold text-destructive">
+                    {formatMoney(agg.actual - agg.projected, currency)}
+                  </span>
+                </div>
+              )}
             </div>
           </Card>
         );
