@@ -47,6 +47,7 @@ export interface RecentExpense {
   date: string;
   description: string | null;
   categoryName: string | null;
+  affectsBudget: boolean;
 }
 
 export interface DebtsSummary {
