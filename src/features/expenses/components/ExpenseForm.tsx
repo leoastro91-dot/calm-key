@@ -20,8 +20,13 @@ import { CategoryPickerByBlock } from "@/features/budget/components/CategoryPick
 import { PocketSelector } from "@/features/movements/components/PocketSelector";
 import { ProtectedPocketWarning } from "@/features/movements/components/ProtectedPocketWarning";
 import { SpendingNatureSelector } from "./SpendingNatureSelector";
+import { FundingSourceSelector } from "./FundingSourceSelector";
 import { useRegisterExpense } from "../hooks/useRegisterExpense";
-import type { SpendingNature, Subcategory } from "../domain/types";
+import type {
+  ExpenseFundingSource,
+  SpendingNature,
+  Subcategory,
+} from "../domain/types";
 
 interface Props {
   accounts: Account[];
