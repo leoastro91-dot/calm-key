@@ -152,11 +152,14 @@ export function ExpenseForm({
         category_id: categoryId,
         subcategory_id: subcategoryId || null,
         spending_nature: nature,
+        affects_budget: funding === "period_budget",
       });
       toast(
-        result.linkedToBudget
-          ? "Gasto registrado y vinculado a tu presupuesto."
-          : "Gasto registrado. No hay línea de presupuesto para esa categoría.",
+        !result.affectsBudget
+          ? "Gasto registrado como uso de fondo acumulado. No afectó el presupuesto del período."
+          : result.linkedToBudget
+            ? "Gasto registrado y vinculado a tu presupuesto."
+            : "Gasto registrado. No hay línea de presupuesto para esa categoría.",
         "success",
       );
       onDone();
