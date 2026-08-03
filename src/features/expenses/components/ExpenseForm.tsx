@@ -83,6 +83,25 @@ export function ExpenseForm({
   const isProtected = pocket?.money_state === "protected";
   const currency = account?.currency ?? "COP";
 
+  const isFundLike =
+    Boolean(pocket) &&
+    (pocket!.money_state !== "available" || Number(pocket!.target_amount) > 0);
+
+  /** Sugerencia automática de financiación mientras el usuario no decida. */
+  const applySuggestion = (nextPocketId: string) => {
+    if (fundingTouched) return;
+    const p = activePockets.find((x) => x.id === nextPocketId) ?? null;
+    if (!p) return;
+    const fund =
+      p.money_state !== "available" || Number(p.target_amount) > 0;
+    setFunding(fund ? "accumulated_fund" : "period_budget");
+  };
+
+  const onChangePocket = (id: string) => {
+    setPocketId(id);
+    applySuggestion(id);
+  };
+
   const subOptions = useMemo(() => {
     if (!categoryId) return [];
     return subcategories.filter((s) => s.category_id === categoryId);
@@ -91,8 +110,11 @@ export function ExpenseForm({
   const onChangeAccount = (id: string) => {
     setAccountId(id);
     const list = activePockets.filter((p) => p.account_id === id);
-    setPocketId(list[0]?.id ?? "");
+    const next = list[0]?.id ?? "";
+    setPocketId(next);
+    applySuggestion(next);
   };
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
