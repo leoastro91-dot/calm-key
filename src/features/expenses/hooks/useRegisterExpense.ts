@@ -33,6 +33,8 @@ export interface RegisterExpenseInput {
   category_id: string;
   subcategory_id: string | null;
   spending_nature: SpendingNature;
+  /** true = consume presupuesto del período; false = uso de fondo acumulado. */
+  affects_budget: boolean;
 }
 
 async function fetchPocketBalance(id: string): Promise<number> {
