@@ -108,6 +108,7 @@ export function useRegisterExpense() {
         financial_period_id: period?.id ?? null,
         spending_nature: input.spending_nature,
         budget_item_id: budgetItem?.id ?? null,
+        affects_budget: input.affects_budget,
       });
 
       // 4. UPDATE bolsillo y cuenta.
@@ -123,7 +124,7 @@ export function useRegisterExpense() {
       if (acctErr) throw acctErr;
 
       // 5. Reconciliar ejecución si hay línea de presupuesto.
-      if (budgetItem) {
+      if (input.affects_budget && budgetItem) {
         await budgetItemRepository.refreshExecutionForTransaction({
           budget_item_id: budgetItem.id,
           category_id: input.category_id,
@@ -131,7 +132,10 @@ export function useRegisterExpense() {
         });
       }
 
-      return { linkedToBudget: Boolean(budgetItem) };
+      return {
+        affectsBudget: input.affects_budget,
+        linkedToBudget: Boolean(input.affects_budget && budgetItem),
+      };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] });
