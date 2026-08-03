@@ -76,6 +76,17 @@ export function BudgetBlockSummary({
           style={{ width: `${Math.max(ratio * 100, 2)}%` }}
         />
       </div>
+      <p className="text-xs text-muted-foreground">
+        Ejecutado {formatMoney(actual, currency)} · Disponible{" "}
+        <span className="font-semibold text-foreground">
+          {formatMoney(availableToSpend, currency)}
+        </span>
+      </p>
+      {overspend > 0 && (
+        <p className="text-xs font-medium text-destructive">
+          Sobrepaso del bloque: {formatMoney(overspend, currency)}
+        </p>
+      )}
       {over && (
         <p className="text-xs text-destructive">
           Superaste el objetivo del bloque por {formatMoney(projected - target, currency)}.
