@@ -190,7 +190,7 @@ export function ExpenseForm({
         accountId={accountId}
         pocketId={pocketId}
         onChangeAccount={onChangeAccount}
-        onChangePocket={setPocketId}
+        onChangePocket={onChangePocket}
         currency={currency}
       />
 
