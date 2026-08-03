@@ -55,10 +55,22 @@ export function ExpenseHistoryList({ items }: Props) {
                     − {formatMoney(Number(it.amount), currency)}
                   </p>
                 </div>
-                <p className="truncate text-xs text-muted-foreground">
-                  {formatDateEs(it.date)} · {source} ·{" "}
-                  {SPENDING_NATURE_LABELS[it.spending_nature]}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                      it.affects_budget
+                        ? "bg-primary/10 text-primary"
+                        : "bg-accent/15 text-foreground"
+                    }`}
+                  >
+                    {it.affects_budget ? "Presupuesto" : "Fondo acumulado"}
+                  </span>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {formatDateEs(it.date)} · {source} ·{" "}
+                    {SPENDING_NATURE_LABELS[it.spending_nature]}
+                  </p>
+                </div>
+
                 {(it.description || it.event_tag) && (
                   <div className="flex flex-wrap items-center gap-2 pt-0.5">
                     {it.description && (
