@@ -203,6 +203,17 @@ export function ExpenseForm({
         </p>
       )}
 
+      <FundingSourceSelector
+        value={funding}
+        onChange={(v) => {
+          setFundingTouched(true);
+          setFunding(v);
+        }}
+        showFundHint={isFundLike}
+      />
+
+
+
       {isProtected && pocket && (
         <ProtectedPocketWarning pocketName={pocket.name} />
       )}
