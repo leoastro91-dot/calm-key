@@ -6,7 +6,7 @@ import { getSupabase } from "@/features/shared/services/supabaseClient";
 import type { ExpenseRow, SpendingNature } from "../domain/types";
 
 const COLS =
-  "id, type, amount, date, description, event_tag, account_id, pocket_id, category_id, subcategory_id, budget_item_id, spending_nature, financial_period_id";
+  "id, type, amount, date, description, event_tag, account_id, pocket_id, category_id, subcategory_id, budget_item_id, spending_nature, financial_period_id, affects_budget";
 
 export const expenseTransactionRepository = {
   async createExpense(input: {
@@ -23,6 +23,7 @@ export const expenseTransactionRepository = {
     financial_period_id: string | null;
     spending_nature: SpendingNature;
     budget_item_id: string | null;
+    affects_budget: boolean;
   }): Promise<{ id: string }> {
     if (input.amount <= 0) throw new Error("EXPENSE_MUST_BE_POSITIVE");
     const { data, error } = await getSupabase()
@@ -43,8 +44,8 @@ export const expenseTransactionRepository = {
         subcategory_id: input.subcategory_id,
         financial_period_id: input.financial_period_id,
         spending_nature: input.spending_nature,
-        affects_budget: true,
-        budget_item_id: input.budget_item_id,
+        affects_budget: input.affects_budget,
+        budget_item_id: input.affects_budget ? input.budget_item_id : null,
         is_onboarding_entry: false,
       })
       .select("id")
