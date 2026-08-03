@@ -116,11 +116,22 @@ export function DashboardScreen() {
             Necesitas un período activo para ver tu presupuesto.
           </SectionEmpty>
         ) : (
-          <BudgetBlocksSummary
-            blocks={d.blocks}
-            profile={d.profile}
-            currency={d.currency}
-          />
+          <>
+            <BudgetBlocksSummary
+              blocks={d.blocks}
+              profile={d.profile}
+              currency={d.currency}
+            />
+            {d.fundUsageTotal > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Además gastaste{" "}
+                <span className="font-semibold text-foreground">
+                  {formatMoney(d.fundUsageTotal, d.currency)}
+                </span>{" "}
+                desde fondos acumulados. No consume el presupuesto del período.
+              </p>
+            )}
+          </>
         )}
       </section>
 
