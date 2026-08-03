@@ -25,6 +25,23 @@ export const SPENDING_NATURE_DESCRIPTIONS: Record<SpendingNature, string> = {
   recurring: "Se repite cada período (arriendo, servicios…).",
 };
 
+/**
+ * Origen de financiación (sólo frontend). En Supabase se persiste
+ * únicamente con transactions.affects_budget.
+ */
+export type ExpenseFundingSource = "period_budget" | "accumulated_fund";
+
+export const FUNDING_SOURCE_LABELS: Record<ExpenseFundingSource, string> = {
+  period_budget: "Presupuesto del período",
+  accumulated_fund: "Fondo acumulado",
+};
+
+export const FUNDING_SOURCE_HELP: Record<ExpenseFundingSource, string> = {
+  period_budget: "Este gasto consume el presupuesto operativo de este ciclo.",
+  accumulated_fund:
+    "Este gasto usa dinero que ya estaba acumulado en el bolsillo. Se verá en historial y patrimonio, pero no aumenta el presupuesto ejecutado.",
+};
+
 export interface Subcategory {
   id: string;
   category_id: string;
@@ -45,6 +62,7 @@ export interface ExpenseRow {
   budget_item_id: string | null;
   spending_nature: SpendingNature;
   financial_period_id: string | null;
+  affects_budget: boolean;
 }
 
 export interface ExpenseHistoryItem extends ExpenseRow {

@@ -41,6 +41,7 @@ export function RecentExpensesList({ expenses, currency }: Props) {
                 <span className="text-xs text-muted-foreground">
                   {formatDateEs(e.date)}
                   {e.categoryName && e.description ? ` · ${e.description}` : ""}
+                  {!e.affectsBudget ? " · Fondo acumulado" : ""}
                 </span>
               </div>
               <span className="text-sm font-semibold text-foreground tabular-numbers">

@@ -20,8 +20,13 @@ import { CategoryPickerByBlock } from "@/features/budget/components/CategoryPick
 import { PocketSelector } from "@/features/movements/components/PocketSelector";
 import { ProtectedPocketWarning } from "@/features/movements/components/ProtectedPocketWarning";
 import { SpendingNatureSelector } from "./SpendingNatureSelector";
+import { FundingSourceSelector } from "./FundingSourceSelector";
 import { useRegisterExpense } from "../hooks/useRegisterExpense";
-import type { SpendingNature, Subcategory } from "../domain/types";
+import type {
+  ExpenseFundingSource,
+  SpendingNature,
+  Subcategory,
+} from "../domain/types";
 
 interface Props {
   accounts: Account[];
@@ -57,6 +62,8 @@ export function ExpenseForm({
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(toISODate(new Date()));
   const [nature, setNature] = useState<SpendingNature>("normal");
+  const [funding, setFunding] = useState<ExpenseFundingSource>("period_budget");
+  const [fundingTouched, setFundingTouched] = useState(false);
   const [description, setDescription] = useState("");
   const [eventTag, setEventTag] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +83,25 @@ export function ExpenseForm({
   const isProtected = pocket?.money_state === "protected";
   const currency = account?.currency ?? "COP";
 
+  const isFundLike =
+    Boolean(pocket) &&
+    (pocket!.money_state !== "available" || Number(pocket!.target_amount) > 0);
+
+  /** Sugerencia automática de financiación mientras el usuario no decida. */
+  const applySuggestion = (nextPocketId: string) => {
+    if (fundingTouched) return;
+    const p = activePockets.find((x) => x.id === nextPocketId) ?? null;
+    if (!p) return;
+    const fund =
+      p.money_state !== "available" || Number(p.target_amount) > 0;
+    setFunding(fund ? "accumulated_fund" : "period_budget");
+  };
+
+  const onChangePocket = (id: string) => {
+    setPocketId(id);
+    applySuggestion(id);
+  };
+
   const subOptions = useMemo(() => {
     if (!categoryId) return [];
     return subcategories.filter((s) => s.category_id === categoryId);
@@ -84,8 +110,11 @@ export function ExpenseForm({
   const onChangeAccount = (id: string) => {
     setAccountId(id);
     const list = activePockets.filter((p) => p.account_id === id);
-    setPocketId(list[0]?.id ?? "");
+    const next = list[0]?.id ?? "";
+    setPocketId(next);
+    applySuggestion(next);
   };
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,11 +152,14 @@ export function ExpenseForm({
         category_id: categoryId,
         subcategory_id: subcategoryId || null,
         spending_nature: nature,
+        affects_budget: funding === "period_budget",
       });
       toast(
-        result.linkedToBudget
-          ? "Gasto registrado y vinculado a tu presupuesto."
-          : "Gasto registrado. No hay línea de presupuesto para esa categoría.",
+        !result.affectsBudget
+          ? "Gasto registrado como uso de fondo acumulado. No afectó el presupuesto del período."
+          : result.linkedToBudget
+            ? "Gasto registrado y vinculado a tu presupuesto."
+            : "Gasto registrado. No hay línea de presupuesto para esa categoría.",
         "success",
       );
       onDone();
@@ -158,7 +190,7 @@ export function ExpenseForm({
         accountId={accountId}
         pocketId={pocketId}
         onChangeAccount={onChangeAccount}
-        onChangePocket={setPocketId}
+        onChangePocket={onChangePocket}
         currency={currency}
       />
 
@@ -170,6 +202,17 @@ export function ExpenseForm({
           </span>
         </p>
       )}
+
+      <FundingSourceSelector
+        value={funding}
+        onChange={(v) => {
+          setFundingTouched(true);
+          setFunding(v);
+        }}
+        showFundHint={isFundLike}
+      />
+
+
 
       {isProtected && pocket && (
         <ProtectedPocketWarning pocketName={pocket.name} />

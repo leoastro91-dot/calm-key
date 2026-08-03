@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Alert } from "@/features/shared/components/Alert";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
+import { formatMoney } from "@/features/accounts/domain/types";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { useGoalPockets } from "@/features/goals/hooks/useGoalPockets";
 import { PatrimonySummary } from "./PatrimonySummary";
@@ -116,11 +117,22 @@ export function DashboardScreen() {
             Necesitas un período activo para ver tu presupuesto.
           </SectionEmpty>
         ) : (
-          <BudgetBlocksSummary
-            blocks={d.blocks}
-            profile={d.profile}
-            currency={d.currency}
-          />
+          <>
+            <BudgetBlocksSummary
+              blocks={d.blocks}
+              profile={d.profile}
+              currency={d.currency}
+            />
+            {d.fundUsageTotal > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Además gastaste{" "}
+                <span className="font-semibold text-foreground">
+                  {formatMoney(d.fundUsageTotal, d.currency)}
+                </span>{" "}
+                desde fondos acumulados. No consume el presupuesto del período.
+              </p>
+            )}
+          </>
         )}
       </section>
 

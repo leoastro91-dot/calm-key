@@ -33,6 +33,8 @@ export interface RegisterExpenseInput {
   category_id: string;
   subcategory_id: string | null;
   spending_nature: SpendingNature;
+  /** true = consume presupuesto del período; false = uso de fondo acumulado. */
+  affects_budget: boolean;
 }
 
 async function fetchPocketBalance(id: string): Promise<number> {
@@ -78,7 +80,8 @@ export function useRegisterExpense() {
       let budgetItem = null as Awaited<
         ReturnType<typeof budgetItemRepository.findByCategory>
       >;
-      if (period) {
+      // Sólo tocamos presupuesto cuando el gasto se financia con el ciclo.
+      if (period && input.affects_budget) {
         const budget = await budgetRepository.getOrCreateForActivePeriod({
           user_id: user.id,
           workspace_id: workspace.id,
@@ -105,6 +108,7 @@ export function useRegisterExpense() {
         financial_period_id: period?.id ?? null,
         spending_nature: input.spending_nature,
         budget_item_id: budgetItem?.id ?? null,
+        affects_budget: input.affects_budget,
       });
 
       // 4. UPDATE bolsillo y cuenta.
@@ -120,7 +124,7 @@ export function useRegisterExpense() {
       if (acctErr) throw acctErr;
 
       // 5. Reconciliar ejecución si hay línea de presupuesto.
-      if (budgetItem) {
+      if (input.affects_budget && budgetItem) {
         await budgetItemRepository.refreshExecutionForTransaction({
           budget_item_id: budgetItem.id,
           category_id: input.category_id,
@@ -128,7 +132,10 @@ export function useRegisterExpense() {
         });
       }
 
-      return { linkedToBudget: Boolean(budgetItem) };
+      return {
+        affectsBudget: input.affects_budget,
+        linkedToBudget: Boolean(input.affects_budget && budgetItem),
+      };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] });

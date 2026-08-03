@@ -47,6 +47,7 @@ export interface RecentExpense {
   date: string;
   description: string | null;
   categoryName: string | null;
+  affectsBudget: boolean;
 }
 
 export interface DebtsSummary {
@@ -259,8 +260,18 @@ export function useDashboardData() {
       categoryName: r.category_id
         ? (byId.get(r.category_id)?.name ?? null)
         : null,
+      affectsBudget: Boolean(r.affects_budget),
     }));
   }, [expensesQ.data, categoriesQ.data]);
+
+  /** Gasto del período pagado con fondos acumulados (no consume presupuesto). */
+  const fundUsageTotal = useMemo(() => {
+    const rows: ExpenseRow[] = expensesQ.data ?? [];
+    return rows
+      .filter((r) => !r.affects_budget)
+      .reduce((s, r) => s + Number(r.amount), 0);
+  }, [expensesQ.data]);
+
 
   const debtsSummary: DebtsSummary = useMemo(() => {
     const debts: Debt[] = debtsQ.data ?? [];
@@ -292,6 +303,7 @@ export function useDashboardData() {
     blocks,
     totalActual,
     recentExpenses,
+    fundUsageTotal,
     debtsSummary,
     status: {
       accounts: {
