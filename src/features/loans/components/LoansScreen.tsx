@@ -99,8 +99,8 @@ export function LoansScreen() {
       >
         {(
           [
-            ["active", `Activos (${activeLoans.length})`],
-            ["paid", `Pagados (${paidLoans.length})`],
+            ["active", `Activos (${filteredActive.length})`],
+            ["paid", `Pagados (${filteredPaid.length})`],
           ] as const
         ).map(([value, label]) => (
           <button
