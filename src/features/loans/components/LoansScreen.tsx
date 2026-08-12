@@ -12,6 +12,7 @@ import { LoanList } from "./LoanList";
 
 export function LoansScreen() {
   const {
+    loans,
     activeLoans,
     paidLoans,
     accounts,
