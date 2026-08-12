@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
+import { formatMoney } from "@/features/accounts/domain/types";
+import { expectedReturnAmount } from "../domain/types";
 import { Alert } from "@/features/shared/components/Alert";
 import { Button } from "@/features/shared/components/Button";
 import { Card } from "@/features/shared/components/Card";
