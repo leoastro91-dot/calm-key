@@ -6,6 +6,13 @@ import { Alert } from "@/features/shared/components/Alert";
 import { Button } from "@/features/shared/components/Button";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useLoans } from "../hooks/useLoans";
 import { CreateLoanForm } from "./CreateLoanForm";
 import { LoanList } from "./LoanList";
@@ -94,31 +101,32 @@ export function LoansScreen() {
 
       {people.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div
-            className="flex flex-wrap gap-2"
-            role="group"
-            aria-label="Filtrar por persona"
-          >
-            {[{ name: "all", active: 0, count: loans.length }, ...people].map(
-              (p) => {
-                const selected = person === p.name;
-                return (
-                  <button
-                    key={p.name}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => setPerson(p.name)}
-                    className={
-                      selected
-                        ? "rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground"
-                        : "rounded-full border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground"
-                    }
-                  >
-                    {p.name === "all" ? "Todas las personas" : p.name}
-                  </button>
-                );
-              },
-            )}
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="person-filter"
+              className="text-sm font-medium text-foreground"
+            >
+              Filtrar por persona
+            </label>
+            <Select value={person} onValueChange={setPerson}>
+              <SelectTrigger
+                id="person-filter"
+                className="w-full"
+                aria-label="Filtrar por persona"
+              >
+                <SelectValue placeholder="Selecciona una persona" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  Todas las personas ({loans.length})
+                </SelectItem>
+                {people.map((p) => (
+                  <SelectItem key={p.name} value={p.name}>
+                    {p.name} · {formatMoney(p.active, "COP")} pendiente
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Card className="flex flex-col gap-1 p-4">
