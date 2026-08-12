@@ -6,6 +6,13 @@ import { Alert } from "@/features/shared/components/Alert";
 import { Button } from "@/features/shared/components/Button";
 import { Card } from "@/features/shared/components/Card";
 import { Spinner } from "@/features/shared/components/Spinner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useLoans } from "../hooks/useLoans";
 import { CreateLoanForm } from "./CreateLoanForm";
 import { LoanList } from "./LoanList";
