@@ -92,6 +92,54 @@ export function LoansScreen() {
         </Card>
       )}
 
+      {people.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Filtrar por persona"
+          >
+            {[{ name: "all", active: 0, count: loans.length }, ...people].map(
+              (p) => {
+                const selected = person === p.name;
+                return (
+                  <button
+                    key={p.name}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setPerson(p.name)}
+                    className={
+                      selected
+                        ? "rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground"
+                        : "rounded-full border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground"
+                    }
+                  >
+                    {p.name === "all" ? "Todas las personas" : p.name}
+                  </button>
+                );
+              },
+            )}
+          </div>
+
+          <Card className="flex flex-col gap-1 p-4">
+            <p className="text-sm text-muted-foreground">
+              {person === "all"
+                ? "Total pendiente (todas las personas)"
+                : `Total pendiente de ${person}`}
+            </p>
+            <p className="text-2xl font-bold text-foreground">
+              {formatMoney(totalActive, "COP")}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Suma sólo de préstamos activos (capital + interés esperado).
+              {filteredPaid.length > 0
+                ? ` ${filteredPaid.length} préstamo(s) ya devuelto(s) no se cuentan.`
+                : ""}
+            </p>
+          </Card>
+        </div>
+      )}
+
       <div
         className="flex gap-2 rounded-lg bg-muted p-1"
         role="tablist"
