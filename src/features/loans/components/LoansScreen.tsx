@@ -123,7 +123,7 @@ export function LoansScreen() {
       {tab === "active" ? (
         <LoanList
           title="Préstamos activos"
-          loans={activeLoans}
+          loans={filteredActive}
           accounts={accounts}
           pockets={pockets}
           emptyText="Aún no tienes préstamos activos. Cuando le prestes dinero a alguien, aparecerá aquí."
@@ -131,7 +131,7 @@ export function LoansScreen() {
       ) : (
         <LoanList
           title="Préstamos pagados"
-          loans={paidLoans}
+          loans={filteredPaid}
           accounts={accounts}
           pockets={pockets}
           emptyText="Todavía no has registrado devoluciones."
