@@ -22,6 +22,30 @@ export function LoansScreen() {
   } = useLoans();
   const [showForm, setShowForm] = useState(false);
   const [tab, setTab] = useState<"active" | "paid">("active");
+  const [person, setPerson] = useState<string>("all");
+
+  const people = useMemo(() => {
+    const map = new Map<string, { active: number; count: number }>();
+    for (const l of loans) {
+      const key = l.borrower_name.trim();
+      const entry = map.get(key) ?? { active: 0, count: 0 };
+      entry.count += 1;
+      if (l.status === "active") entry.active += expectedReturnAmount(l);
+      map.set(key, entry);
+    }
+    return [...map.entries()]
+      .map(([name, v]) => ({ name, ...v }))
+      .sort((a, b) => b.active - a.active || a.name.localeCompare(b.name));
+  }, [loans]);
+
+  const matches = (name: string) =>
+    person === "all" || name.trim() === person;
+  const filteredActive = activeLoans.filter((l) => matches(l.borrower_name));
+  const filteredPaid = paidLoans.filter((l) => matches(l.borrower_name));
+  const totalActive = filteredActive.reduce(
+    (acc, l) => acc + expectedReturnAmount(l),
+    0,
+  );
 
   if (isLoading) {
     return (
