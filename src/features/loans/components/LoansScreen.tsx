@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
+import { formatMoney } from "@/features/accounts/domain/types";
+import { expectedReturnAmount } from "../domain/types";
 import { Alert } from "@/features/shared/components/Alert";
 import { Button } from "@/features/shared/components/Button";
 import { Card } from "@/features/shared/components/Card";
@@ -10,6 +12,7 @@ import { LoanList } from "./LoanList";
 
 export function LoansScreen() {
   const {
+    loans,
     activeLoans,
     paidLoans,
     accounts,
@@ -20,6 +23,30 @@ export function LoansScreen() {
   } = useLoans();
   const [showForm, setShowForm] = useState(false);
   const [tab, setTab] = useState<"active" | "paid">("active");
+  const [person, setPerson] = useState<string>("all");
+
+  const people = useMemo(() => {
+    const map = new Map<string, { active: number; count: number }>();
+    for (const l of loans) {
+      const key = l.borrower_name.trim();
+      const entry = map.get(key) ?? { active: 0, count: 0 };
+      entry.count += 1;
+      if (l.status === "active") entry.active += expectedReturnAmount(l);
+      map.set(key, entry);
+    }
+    return [...map.entries()]
+      .map(([name, v]) => ({ name, ...v }))
+      .sort((a, b) => b.active - a.active || a.name.localeCompare(b.name));
+  }, [loans]);
+
+  const matches = (name: string) =>
+    person === "all" || name.trim() === person;
+  const filteredActive = activeLoans.filter((l) => matches(l.borrower_name));
+  const filteredPaid = paidLoans.filter((l) => matches(l.borrower_name));
+  const totalActive = filteredActive.reduce(
+    (acc, l) => acc + expectedReturnAmount(l),
+    0,
+  );
 
   if (isLoading) {
     return (
@@ -65,6 +92,54 @@ export function LoansScreen() {
         </Card>
       )}
 
+      {people.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Filtrar por persona"
+          >
+            {[{ name: "all", active: 0, count: loans.length }, ...people].map(
+              (p) => {
+                const selected = person === p.name;
+                return (
+                  <button
+                    key={p.name}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setPerson(p.name)}
+                    className={
+                      selected
+                        ? "rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground"
+                        : "rounded-full border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground"
+                    }
+                  >
+                    {p.name === "all" ? "Todas las personas" : p.name}
+                  </button>
+                );
+              },
+            )}
+          </div>
+
+          <Card className="flex flex-col gap-1 p-4">
+            <p className="text-sm text-muted-foreground">
+              {person === "all"
+                ? "Total pendiente (todas las personas)"
+                : `Total pendiente de ${person}`}
+            </p>
+            <p className="text-2xl font-bold text-foreground">
+              {formatMoney(totalActive, "COP")}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Suma sólo de préstamos activos (capital + interés esperado).
+              {filteredPaid.length > 0
+                ? ` ${filteredPaid.length} préstamo(s) ya devuelto(s) no se cuentan.`
+                : ""}
+            </p>
+          </Card>
+        </div>
+      )}
+
       <div
         className="flex gap-2 rounded-lg bg-muted p-1"
         role="tablist"
@@ -72,8 +147,8 @@ export function LoansScreen() {
       >
         {(
           [
-            ["active", `Activos (${activeLoans.length})`],
-            ["paid", `Pagados (${paidLoans.length})`],
+            ["active", `Activos (${filteredActive.length})`],
+            ["paid", `Pagados (${filteredPaid.length})`],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -96,7 +171,7 @@ export function LoansScreen() {
       {tab === "active" ? (
         <LoanList
           title="Préstamos activos"
-          loans={activeLoans}
+          loans={filteredActive}
           accounts={accounts}
           pockets={pockets}
           emptyText="Aún no tienes préstamos activos. Cuando le prestes dinero a alguien, aparecerá aquí."
@@ -104,7 +179,7 @@ export function LoansScreen() {
       ) : (
         <LoanList
           title="Préstamos pagados"
-          loans={paidLoans}
+          loans={filteredPaid}
           accounts={accounts}
           pockets={pockets}
           emptyText="Todavía no has registrado devoluciones."
