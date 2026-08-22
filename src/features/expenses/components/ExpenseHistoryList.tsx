@@ -116,7 +116,7 @@ export function ExpenseHistoryList({ items }: Props) {
                               onSuccess: () => setConfirmId(null),
                             })
                           }
-                          isLoading={del.isPending}
+                          loading={del.isPending}
                         >
                           Sí, reversar
                         </Button>
