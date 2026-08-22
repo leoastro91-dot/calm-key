@@ -71,4 +71,13 @@ export const expenseTransactionRepository = {
     if (error) throw error;
     return (data as ExpenseRow[]) ?? [];
   },
+
+  /** Elimina un gasto (reversa). Usado por useDeleteExpense. */
+  async remove(id: string): Promise<void> {
+    const { error } = await getSupabase()
+      .from("transactions")
+      .delete()
+      .eq("id", id);
+    if (error) throw error;
+  },
 };
