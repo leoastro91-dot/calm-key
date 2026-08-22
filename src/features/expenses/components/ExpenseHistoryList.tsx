@@ -1,4 +1,8 @@
-import { Receipt, Inbox, Tag } from "lucide-react";
+import { useState } from "react";
+import { Receipt, Inbox, Tag, Undo2 } from "lucide-react";
+import { Alert } from "@/features/shared/components/Alert";
+import { Button } from "@/features/shared/components/Button";
+import { useDeleteExpense } from "../hooks/useDeleteExpense";
 import { Card } from "@/features/shared/components/Card";
 import { formatMoney } from "@/features/accounts/domain/types";
 import { formatDateEs } from "@/features/income/domain/types";
@@ -12,6 +16,9 @@ interface Props {
 }
 
 export function ExpenseHistoryList({ items }: Props) {
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const del = useDeleteExpense();
+
   if (items.length === 0) {
     return (
       <Card className="flex flex-col items-center gap-2 p-8 text-center">
@@ -86,6 +93,51 @@ export function ExpenseHistoryList({ items }: Props) {
                     )}
                   </div>
                 )}
+
+                <div className="flex flex-col gap-2 pt-1">
+                  {confirmId === it.id ? (
+                    <>
+                      <p className="text-xs text-muted-foreground">
+                        ¿Reversar este gasto? El dinero vuelve a{" "}
+                        {it.pocket?.name ?? "su bolsillo"} y se descuenta de la
+                        ejecución del presupuesto.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="secondary"
+                          onClick={() => setConfirmId(null)}
+                          disabled={del.isPending}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            del.mutate(it, {
+                              onSuccess: () => setConfirmId(null),
+                            })
+                          }
+                          isLoading={del.isPending}
+                        >
+                          Sí, reversar
+                        </Button>
+                      </div>
+                      {del.isError && (
+                        <Alert variant="error">
+                          No pudimos reversar el gasto. Intenta de nuevo.
+                        </Alert>
+                      )}
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmId(it.id)}
+                      className="inline-flex w-fit items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Undo2 size={12} aria-hidden />
+                      Reversar
+                    </button>
+                  )}
+                </div>
               </div>
             </Card>
           </li>
