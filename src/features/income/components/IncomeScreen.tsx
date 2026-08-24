@@ -14,6 +14,7 @@ import {
 import { ActivePeriodHeader } from "./ActivePeriodHeader";
 import { IncomeList } from "./IncomeList";
 import { RegisterIncomeForm } from "./RegisterIncomeForm";
+import { ClosePeriodCard } from "./ClosePeriodCard";
 import { getSupabase } from "@/features/shared/services/supabaseClient";
 
 /**
@@ -113,6 +114,8 @@ export function IncomeScreen() {
     <div className="flex flex-col gap-5">
       <ActivePeriodHeader period={period} currency={currency} />
 
+      <ClosePeriodCard period={period} currency={currency} />
+
       {!canRegister && (
         <Alert variant="warning">
           Necesitas al menos una cuenta con un bolsillo activo para registrar
@@ -154,6 +157,7 @@ export function IncomeScreen() {
             pocketNamesById={pocketNamesById}
             transactionDestinations={txDestQ.data ?? {}}
             currency={currency}
+            period={period}
           />
         )}
       </section>
