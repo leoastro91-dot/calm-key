@@ -138,7 +138,7 @@ export function ClosePeriodCard({ period, currency }: Props) {
         placeholder={String(summary?.expectedIncome ?? period.expected_income)}
         value={expected}
         onChange={(e) => setExpected(e.target.value)}
-        hint={`Sugerido según tus fuentes de ingreso: ${formatMoney(
+        helperText={`Sugerido según tus fuentes de ingreso: ${formatMoney(
           summary?.expectedIncome ?? Number(period.expected_income),
           currency,
         )}`}
