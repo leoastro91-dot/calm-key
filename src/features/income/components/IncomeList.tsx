@@ -1,8 +1,12 @@
-import { Inbox, ArrowDownCircle } from "lucide-react";
+import { useState } from "react";
+import { Inbox, ArrowDownCircle, Undo2 } from "lucide-react";
+import { Button } from "@/features/shared/components/Button";
+import { useDeleteIncome } from "../hooks/useDeleteIncome";
 import { Card } from "@/features/shared/components/Card";
 import {
   formatDateEs,
   INCOME_SOURCE_TYPE_LABELS,
+  type ActivePeriod,
   type PeriodIncomeWithSource,
 } from "../domain/types";
 import { formatMoney } from "@/features/accounts/domain/types";
@@ -16,6 +20,7 @@ interface Props {
     { account_id: string; pocket_id: string }
   >;
   currency: string;
+  period: ActivePeriod;
 }
 
 export function IncomeList({
@@ -24,7 +29,11 @@ export function IncomeList({
   pocketNamesById,
   transactionDestinations,
   currency,
+  period,
 }: Props) {
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const del = useDeleteIncome();
+
   if (incomes.length === 0) {
     return (
       <Card className="flex flex-col items-center gap-2 p-8 text-center">
@@ -54,9 +63,12 @@ export function IncomeList({
         const typeLabel = inc.income_source
           ? INCOME_SOURCE_TYPE_LABELS[inc.income_source.source_type]
           : null;
+        const isConfirming = confirmId === inc.id;
+        const isDeleting = del.isPending && del.variables?.period_income_id === inc.id;
         return (
           <li key={inc.id}>
-            <Card className="flex items-center gap-3 p-4 sm:p-4">
+            <Card className="flex flex-col gap-3 p-4 sm:p-4">
+             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
                 <ArrowDownCircle size={20} aria-hidden />
               </span>
@@ -79,6 +91,44 @@ export function IncomeList({
               <p className="shrink-0 text-sm font-semibold text-success tabular-numbers">
                 +{formatMoney(Number(inc.amount_received), currency)}
               </p>
+             </div>
+             <div className="flex flex-wrap items-center justify-end gap-2">
+               {isConfirming ? (
+                 <>
+                   <span className="mr-auto text-xs text-muted-foreground">
+                     Se descontará del bolsillo, la cuenta y el total del período.
+                   </span>
+                   <Button
+                     variant="ghost"
+                     onClick={() => setConfirmId(null)}
+                     disabled={isDeleting}
+                   >
+                     Cancelar
+                   </Button>
+                   <Button
+                     variant="destructive"
+                     onClick={() =>
+                       del.mutate(
+                         {
+                           period_income_id: inc.id,
+                           transaction_id: inc.transaction_id,
+                           amount: Number(inc.amount_received),
+                           period,
+                         },
+                         { onSuccess: () => setConfirmId(null) },
+                       )
+                     }
+                     disabled={isDeleting}
+                   >
+                     {isDeleting ? "Reversando…" : "Confirmar reversa"}
+                   </Button>
+                 </>
+               ) : (
+                 <Button variant="ghost" onClick={() => setConfirmId(inc.id)}>
+                   <Undo2 size={16} aria-hidden /> Reversar
+                 </Button>
+               )}
+             </div>
             </Card>
           </li>
         );

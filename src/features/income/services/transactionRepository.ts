@@ -38,3 +38,9 @@ export const transactionRepository = {
     return data as { id: string };
   },
 };
+
+/** Reversa de un ingreso: borra la transaction asociada. */
+export async function removeIncomeTransaction(id: string): Promise<void> {
+  const { error } = await getSupabase().from("transactions").delete().eq("id", id);
+  if (error) throw error;
+}

@@ -40,3 +40,9 @@ export const periodIncomeRepository = {
     return (data as unknown as PeriodIncomeWithSource[]) ?? [];
   },
 };
+
+/** Borra la fila de period_incomes (reversa de un ingreso). */
+export async function removePeriodIncome(id: string): Promise<void> {
+  const { error } = await getSupabase().from("period_incomes").delete().eq("id", id);
+  if (error) throw error;
+}
