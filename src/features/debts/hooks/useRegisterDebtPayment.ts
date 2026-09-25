@@ -101,7 +101,7 @@ export function useRegisterDebtPayment() {
           workspace_id: workspace.id,
           financial_period_id: period.id,
         });
-        budgetItem = await budgetItemRepository.findByCategory(
+        budgetItem = await budgetItemRepository.findOrCreateByCategory(
           budget.id,
           input.category_id,
         );

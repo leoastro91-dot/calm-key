@@ -84,14 +84,84 @@ async function reconcileItems(items: BudgetItem[]): Promise<BudgetItem[]> {
   );
 }
 
+async function getBudgetMeta(budgetId: string) {
+  const { data, error } = await getSupabase()
+    .from("budgets")
+    .select("id, user_id, workspace_id, financial_period_id")
+    .eq("id", budgetId)
+    .single();
+  if (error) throw error;
+  return data as {
+    id: string;
+    user_id: string;
+    workspace_id: string;
+    financial_period_id: string;
+  };
+}
+
+/**
+ * Gastos no presupuestados: una categoría real que no estaba en el plan
+ * se incorpora automáticamente con proyectado 0, para que su ejecución
+ * reduzca el disponible y se refleje como sobrepaso.
+ */
+async function findOrCreate(budgetId: string, categoryId: string) {
+  const { data, error } = await getSupabase()
+    .from("budget_items")
+    .select(COLS)
+    .eq("budget_id", budgetId)
+    .eq("category_id", categoryId)
+    .maybeSingle();
+  if (error) throw error;
+  if (data) return data as BudgetItem;
+  const meta = await getBudgetMeta(budgetId);
+  return budgetItemRepository.create({
+    budget_id: budgetId,
+    user_id: meta.user_id,
+    workspace_id: meta.workspace_id,
+    category_id: categoryId,
+    projected_amount: 0,
+  });
+}
+
+/** Vincula transacciones del período que quedaron sin budget_item_id. */
+async function linkOrphanTransactions(budgetId: string) {
+  const meta = await getBudgetMeta(budgetId);
+  const { data, error } = await getSupabase()
+    .from("transactions")
+    .select("id, category_id")
+    .eq("financial_period_id", meta.financial_period_id)
+    .eq("affects_budget", true)
+    .not("category_id", "is", null)
+    .is("budget_item_id", null);
+  if (error) throw error;
+  const rows = (data ?? []) as { id: string; category_id: string }[];
+  const byCat = new Map<string, string[]>();
+  for (const r of rows) {
+    byCat.set(r.category_id, [...(byCat.get(r.category_id) ?? []), r.id]);
+  }
+  for (const [catId, ids] of byCat) {
+    const item = await findOrCreate(budgetId, catId);
+    const { error: upErr } = await getSupabase()
+      .from("transactions")
+      .update({ budget_item_id: item.id })
+      .in("id", ids);
+    if (upErr) throw upErr;
+  }
+}
+
 export const budgetItemRepository = {
   async listByBudget(budgetId: string): Promise<BudgetItem[]> {
+    await linkOrphanTransactions(budgetId);
     const { data, error } = await getSupabase()
       .from("budget_items")
       .select(COLS)
       .eq("budget_id", budgetId);
     if (error) throw error;
     return reconcileItems((data ?? []) as BudgetItem[]);
+  },
+
+  findOrCreateByCategory(budgetId: string, categoryId: string) {
+    return findOrCreate(budgetId, categoryId);
   },
 
   async create(input: {
