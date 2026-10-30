@@ -25,42 +25,86 @@ function changed(a: number, b: number) {
   return Math.abs(Number(a) - Number(b)) > EXECUTION_EPSILON;
 }
 
+/**
+ * Totales por línea de presupuesto. Una transacción cuenta para una línea si:
+ *  - está vinculada por budget_item_id, o
+ *  - pertenece al mismo período del presupuesto y tiene la misma categoría
+ *    (aunque el vínculo haya quedado vacío o apuntando a otra línea).
+ * Cada transacción se cuenta una sola vez.
+ */
 async function transactionTotalsByBudgetItem(
-  budgetItemIds: string[],
+  items: Pick<BudgetItem, "id" | "budget_id" | "category_id">[],
 ): Promise<Map<string, number>> {
   const totals = new Map<string, number>();
-  if (!budgetItemIds.length) return totals;
+  if (!items.length) return totals;
 
-  const { data, error } = await getSupabase()
+  type Tx = {
+    id: string;
+    budget_item_id: string | null;
+    category_id: string | null;
+    financial_period_id: string | null;
+    amount: number;
+    type: string;
+  };
+  const SEL = "id, budget_item_id, category_id, financial_period_id, amount, type";
+  const txById = new Map<string, Tx>();
+
+  const linked = await getSupabase()
     .from("transactions")
-    .select("budget_item_id, amount, type")
-    .in("budget_item_id", budgetItemIds)
+    .select(SEL)
+    .in("budget_item_id", items.map((i) => i.id))
     .eq("affects_budget", true)
     .not("category_id", "is", null);
+  if (linked.error) throw linked.error;
+  for (const t of (linked.data ?? []) as Tx[]) txById.set(t.id, t);
 
-  if (error) throw error;
+  // Período de cada presupuesto involucrado.
+  const budgetIds = [...new Set(items.map((i) => i.budget_id))];
+  const { data: budgets, error: bErr } = await getSupabase()
+    .from("budgets")
+    .select("id, financial_period_id")
+    .in("id", budgetIds);
+  if (bErr) throw bErr;
+  const periodByBudget = new Map(
+    ((budgets ?? []) as { id: string; financial_period_id: string }[]).map(
+      (b) => [b.id, b.financial_period_id],
+    ),
+  );
+  const periodIds = [...new Set(periodByBudget.values())].filter(Boolean);
+  if (periodIds.length) {
+    const byPeriod = await getSupabase()
+      .from("transactions")
+      .select(SEL)
+      .in("financial_period_id", periodIds)
+      .in("category_id", [...new Set(items.map((i) => i.category_id))])
+      .eq("affects_budget", true);
+    if (byPeriod.error) throw byPeriod.error;
+    for (const t of (byPeriod.data ?? []) as Tx[]) txById.set(t.id, t);
+  }
 
-  for (const row of data ?? []) {
-    const tx = row as {
-      budget_item_id: string | null;
-      amount: number;
-      type: string;
-    };
-    if (!tx.budget_item_id) continue;
+  // Línea destino: por (período, categoría); si no, por vínculo directo.
+  const itemByPeriodCat = new Map<string, string>();
+  for (const i of items) {
+    itemByPeriodCat.set(`${periodByBudget.get(i.budget_id)}|${i.category_id}`, i.id);
+  }
+  const itemIds = new Set(items.map((i) => i.id));
+
+  for (const tx of txById.values()) {
+    const target =
+      itemByPeriodCat.get(`${tx.financial_period_id}|${tx.category_id}`) ??
+      (tx.budget_item_id && itemIds.has(tx.budget_item_id) ? tx.budget_item_id : null);
+    if (!target) continue;
     // 'emergency_use' libera dinero de esa categoría: resta ejecución.
-    // expense / debt_payment / transfer categorizados: suman.
     const signed =
       tx.type === "emergency_use" ? -Number(tx.amount) : Number(tx.amount);
-    totals.set(
-      tx.budget_item_id,
-      (totals.get(tx.budget_item_id) ?? 0) + signed,
-    );
+    totals.set(target, (totals.get(target) ?? 0) + signed);
   }
   return totals;
 }
 
 async function reconcileItems(items: BudgetItem[]): Promise<BudgetItem[]> {
-  const totals = await transactionTotalsByBudgetItem(items.map((i) => i.id));
+  const totals = await transactionTotalsByBudgetItem(items);
+
   return Promise.all(
     items.map(async (item) => {
       const fields = executionFields(
