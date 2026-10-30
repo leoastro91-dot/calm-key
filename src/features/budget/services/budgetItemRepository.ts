@@ -167,24 +167,32 @@ async function findOrCreate(budgetId: string, categoryId: string) {
   });
 }
 
-/** Vincula transacciones del período que quedaron sin budget_item_id. */
+/**
+ * Vincula transacciones del período que quedaron sin budget_item_id o
+ * apuntando a una línea de otro presupuesto/categoría.
+ */
 async function linkOrphanTransactions(budgetId: string) {
   const meta = await getBudgetMeta(budgetId);
   const { data, error } = await getSupabase()
     .from("transactions")
-    .select("id, category_id")
+    .select("id, category_id, budget_item_id")
     .eq("financial_period_id", meta.financial_period_id)
     .eq("affects_budget", true)
-    .not("category_id", "is", null)
-    .is("budget_item_id", null);
+    .not("category_id", "is", null);
   if (error) throw error;
-  const rows = (data ?? []) as { id: string; category_id: string }[];
-  const byCat = new Map<string, string[]>();
+  const rows = (data ?? []) as {
+    id: string;
+    category_id: string;
+    budget_item_id: string | null;
+  }[];
+  const byCat = new Map<string, typeof rows>();
   for (const r of rows) {
-    byCat.set(r.category_id, [...(byCat.get(r.category_id) ?? []), r.id]);
+    byCat.set(r.category_id, [...(byCat.get(r.category_id) ?? []), r]);
   }
-  for (const [catId, ids] of byCat) {
+  for (const [catId, list] of byCat) {
     const item = await findOrCreate(budgetId, catId);
+    const ids = list.filter((r) => r.budget_item_id !== item.id).map((r) => r.id);
+    if (!ids.length) continue;
     const { error: upErr } = await getSupabase()
       .from("transactions")
       .update({ budget_item_id: item.id })
@@ -240,7 +248,15 @@ export const budgetItemRepository = {
   },
 
   async updateProjected(id: string, projected_amount: number): Promise<void> {
-    const totals = await transactionTotalsByBudgetItem([id]);
+    const { data: cur, error: curErr } = await getSupabase()
+      .from("budget_items")
+      .select("id, budget_id, category_id")
+      .eq("id", id)
+      .single();
+    if (curErr) throw curErr;
+    const totals = await transactionTotalsByBudgetItem([
+      cur as Pick<BudgetItem, "id" | "budget_id" | "category_id">,
+    ]);
     const fields = executionFields(projected_amount, totals.get(id) ?? 0);
     const { error } = await getSupabase()
       .from("budget_items")
