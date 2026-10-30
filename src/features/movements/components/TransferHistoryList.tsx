@@ -2,6 +2,9 @@ import { ArrowRightLeft, ShieldAlert, Inbox } from "lucide-react";
 import { Card } from "@/features/shared/components/Card";
 import { formatMoney } from "@/features/accounts/domain/types";
 import { formatDateEs } from "@/features/income/domain/types";
+import { useState } from "react";
+import { Button } from "@/features/shared/components/Button";
+import { useDeleteTransfer } from "../hooks/useDeleteTransfer";
 import type { TransferHistoryItem } from "../domain/types";
 
 interface Props {
@@ -9,6 +12,8 @@ interface Props {
 }
 
 export function TransferHistoryList({ items }: Props) {
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const del = useDeleteTransfer();
   if (items.length === 0) {
     return (
       <Card className="flex flex-col items-center gap-2 p-8 text-center">
@@ -38,7 +43,8 @@ export function TransferHistoryList({ items }: Props) {
         const currency = it.fromAccount?.currency ?? it.toAccount?.currency ?? "COP";
         return (
           <li key={it.id}>
-            <Card className="flex items-start gap-3 p-4">
+            <Card className="flex flex-col gap-3 p-4">
+            <div className="flex items-start gap-3">
               <span
                 className={
                   isEmergency
@@ -65,6 +71,41 @@ export function TransferHistoryList({ items }: Props) {
               <p className="shrink-0 text-sm font-semibold text-foreground tabular-numbers">
                 {formatMoney(Number(it.amount), currency)}
               </p>
+            </div>
+            {confirmId === it.id ? (
+              <div className="flex flex-col gap-2 rounded-md bg-muted p-3">
+                <p className="text-xs text-foreground">
+                  ¿Reversar este traslado? El dinero vuelve a {fromLabel}.
+                </p>
+                {del.isError && (
+                  <p className="text-xs text-destructive">
+                    {del.error instanceof Error && del.error.message === "DEST_INSUFFICIENT"
+                      ? "El bolsillo destino ya no tiene ese dinero disponible."
+                      : "No se pudo reversar. Intenta de nuevo."}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="destructive"
+                    loading={del.isPending}
+                    onClick={() => del.mutate(it, { onSuccess: () => setConfirmId(null) })}
+                  >
+                    Sí, reversar
+                  </Button>
+                  <Button variant="ghost" onClick={() => { setConfirmId(null); del.reset(); }}>
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="self-end text-xs font-medium text-primary underline-offset-2 hover:underline"
+                onClick={() => { del.reset(); setConfirmId(it.id); }}
+              >
+                Reversar
+              </button>
+            )}
             </Card>
           </li>
         );
